@@ -1,6 +1,3 @@
-"""As from https://www.section.io/engineering-education/hierarchical-clustering-in-python/"""
-
-# IMPORTS
 import numpy as np # to handle numeric data
 import matplotlib.pyplot as plt # for visualization
 import pandas as pd # for handling dataframe
@@ -13,24 +10,11 @@ newData = ourData.iloc[:, [6, 7]].values # extract the two features from our dat
 
 print(newData)
 
-# MAKING A DENDROGRAM/EXECUTING CLUSTERING ON DATA TO CHOOSE N-CLUSTERS
-import scipy.cluster.hierarchy as sch # importing scipy.cluster.hierarchy for dendrogram
-dendrogram = sch.dendrogram(sch.linkage(newData, method = 'ward')) # finding the optimal number of clusters using dendrogram
-plt.title('Dendrogram') # title of the dendrogram
-plt.xlabel('Customers') # label of the x-axis
-plt.ylabel('Euclidean distances') # label of the y-axis
-plt.show() # show the dendrogram
-
 # EXECUTING CLUSTERING ON DATA WITH CHOICE OF N-CLUSTERS
-from sklearn.cluster import AgglomerativeClustering # this line of code imports AgglomerativeClustering model from sk-learn
-'''
-we need to create an AgglomerativeClustering object, and in it, we pass the following parameters:
-n_cluster= 5, the number of clusters our model should return
-affinity=euclidean, specify metric to be used to calculate distances
-linkage= ward to regulate how distance calculation will be carried out between different clusters.
-'''
-Agg_hc = AgglomerativeClustering(n_clusters = 2, affinity = 'euclidean', linkage = 'ward')
-y_hc = Agg_hc.fit_predict(newData) # model fitting on the dataset
+from sklearn.cluster import DBSCAN # Density-Based Spatial Clustering of Applications with Noise
+
+Density = DBSCAN(eps=3)
+y_hc = Density.fit_predict(newData) # model fitting on the dataset
 
 # VISUALIZING THE CLUSTERING
 # plotting cluster 1

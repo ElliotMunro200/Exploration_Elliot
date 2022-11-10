@@ -16,6 +16,7 @@ import gym
 import logging
 from arguments import get_args
 from env import make_vec_envs
+#from clustering import frontier_clustering
 from utils.storage import GlobalRolloutStorage #, FIFOMemory
 #from utils.optimization import get_optimizer
 from model import RL_Policy 
@@ -669,7 +670,7 @@ def main():
                 print("g_value")
                 print(g_value)
 
-                print("Timer for phase 5")
+                print("Timer for phase 6")
                 timer.toc()
                 timer.tic()
             #g_reward = torch.from_numpy(np.zeros((num_scenes))).float().to(device)

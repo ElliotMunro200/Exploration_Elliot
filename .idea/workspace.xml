@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e060521b-a459-49db-8503-b71e9ad01fc1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/Exploration.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/clustering-density.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/clustering.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Exploration_no-data-or-tmp.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/clustering-hierarchical.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering-hierarchical.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/bug-report.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/bug-report.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/feature-request.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/feature-request.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/questions-help-support.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/questions-help-support.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.github/PULL_REQUEST_TEMPLATE.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.github/PULL_REQUEST_TEMPLATE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.pre-commit-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.pre-commit-config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/CODE_OF_CONDUCT.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/CODE_OF_CONDUCT.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/CONTRIBUTING.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/CONTRIBUTING.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/MANIFEST.in" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/MANIFEST.in" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/baselines/ppo.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/baselines/ppo.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/eqa/mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/eqa/mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/imagenav/gibson.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/imagenav/gibson.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/imagenav/mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/imagenav/mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/objectnav/mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/objectnav/mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/gibson.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/gibson.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/gibson_v2.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/gibson_v2.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/habitat_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/habitat_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/pointnav/mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/single_episode.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/single_episode.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/vln/mp3d_r2r.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/datasets/vln/mp3d_r2r.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/eqa_mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/eqa_mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/imagenav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/imagenav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/imagenav_gibson.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/imagenav_gibson.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/objectnav_mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/objectnav_mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_gibson.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_gibson.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_mp3d.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_mp3d.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_rgbd.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/pointnav_rgbd.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/vln_r2r.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/tasks/vln_r2r.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_all_sensors_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_all_sensors_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_mp3d_eqa_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_mp3d_eqa_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_mp3d_object_nav_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_mp3d_object_nav_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_r2r_vln_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/habitat_r2r_vln_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/new_keys_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/configs/test/new_keys_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/conf-public.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/conf-public.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/conf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/docs.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/docs.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-lab-demo.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-lab-demo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-lab-demo.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-lab-demo.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-sim-demo.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-sim-demo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-sim-demo.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/habitat-sim-demo.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/index.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/index.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/quickstart.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/quickstart.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/quickstart.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/quickstart.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/view-transform-warp.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/view-transform-warp.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/view-transform-warp.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/docs/pages/view-transform-warp.rst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/benchmark.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/example.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/new_actions.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/new_actions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/register_new_sensors_and_measures.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/register_new_sensors_and_measures.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/shortest_path_follower_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/shortest_path_follower_example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/colabs/Habitat_Interactive_Tasks.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/colabs/Habitat_Interactive_Tasks.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/colabs/Habitat_Lab.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/colabs/Habitat_Lab.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/nb_python/Habitat_Interactive_Tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/nb_python/Habitat_Interactive_Tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/nb_python/Habitat_Lab.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/tutorials/nb_python/Habitat_Lab.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/visualization_examples.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/visualization_examples.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/vln_benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/vln_benchmark.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/examples/vln_reference_path_follower_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/examples/vln_reference_path_follower_example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/config/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/config/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/config/default.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/config/default.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/benchmark.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/challenge.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/challenge.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/embodied_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/embodied_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/logging.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/logging.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/registry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/simulator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/spaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/spaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/vector_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/core/vector_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/eqa/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/eqa/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/eqa/mp3d_eqa_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/eqa/mp3d_eqa_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/object_nav/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/object_nav/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/object_nav/object_nav_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/object_nav/object_nav_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/pointnav_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/pointnav_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/pointnav_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/pointnav/pointnav_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/registration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/vln/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/vln/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/vln/r2r_vln_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/datasets/vln/r2r_vln_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/py.typed" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/py.typed" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/actions.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/actions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/habitat_simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/habitat_simulator/habitat_simulator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/pyrobot/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/pyrobot/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/pyrobot/pyrobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/pyrobot/pyrobot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/sims/registration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/eqa/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/eqa/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/eqa/eqa.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/eqa/eqa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/nav.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/nav.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/object_nav_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/object_nav_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/shortest_path_follower.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/nav/shortest_path_follower.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/registration.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/vln/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/vln/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/vln/vln.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/tasks/vln/vln.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/geometry_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/geometry_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/pickle5_multiprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/pickle5_multiprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/profiling_wrapper.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/profiling_wrapper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/test_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/test_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/assets/maps_topdown_agent_sprite/100x100.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/assets/maps_topdown_agent_sprite/100x100.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/fog_of_war.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/fog_of_war.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/maps.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/maps.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/utils/visualizations/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/version.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat/version.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/ppo_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/ppo_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/simple_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/simple_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/slam_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/agents/slam_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/base_il_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/base_il_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/base_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/base_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/baseline_registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/baseline_registry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/environments.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/environments.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/obs_transformers.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/obs_transformers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/rollout_storage.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/rollout_storage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/tensor_dict.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/tensor_dict.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/tensorboard_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/common/tensorboard_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/default.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/default.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_eqa_cnn_pretrain.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_eqa_cnn_pretrain.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_pacman_nav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_pacman_nav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_vqa.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/eqa/il_vqa.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ddppo_imagenav_example.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ddppo_imagenav_example.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ddppo_imagenav_gibson.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ddppo_imagenav_gibson.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ppo_imagenav_example.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/imagenav/ppo_imagenav_example.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/objectnav/ddppo_objectnav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/objectnav/ddppo_objectnav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ddppo_pointnav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ddppo_pointnav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav_example.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav_example.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav_habitat_iccv19.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/pointnav/ppo_pointnav_habitat_iccv19.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ddppo_imagenav_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ddppo_imagenav_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ddppo_pointnav_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ddppo_pointnav_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ppo_imagenav_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ppo_imagenav_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ppo_pointnav_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/config/test/ppo_pointnav_test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/data.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/eqa_cnn_pretrain_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/eqa_cnn_pretrain_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/nav_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/data/nav_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/metrics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/models/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/eqa_cnn_pretrain_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/eqa_cnn_pretrain_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/pacman_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/pacman_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/vqa_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/il/trainers/vqa_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/py.typed" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/py.typed" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/ddp_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/ddp_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/ddppo.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/algo/ddppo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/data_generation/create_gibson_large_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/data_generation/create_gibson_large_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/data_generation/gibson_dset_with_qual.json" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/data_generation/gibson_dset_with_qual.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/multi_node_slurm.sh" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/multi_node_slurm.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/resnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/resnet_policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/resnet_policy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/running_mean_and_var.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/policy/running_mean_and_var.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/single_node.sh" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ddppo/single_node.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/rnn_state_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/rnn_state_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/simple_cnn.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/models/simple_cnn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/policy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/ppo.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/ppo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/ppo_trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/ppo/ppo_trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/rl/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/data/mp3d3_small1k.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/data/mp3d3_small1k.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/data/slam-based-agent.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/data/slam-based-agent.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/mappers.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/mappers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/monodepth.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/monodepth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/path_planners.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/path_planners.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/reprojection.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/reprojection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/slambased/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/env_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/env_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/visualizations/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/visualizations/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/visualizations/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/habitat_baselines/utils/visualizations/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/mypy.ini" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/mypy.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/pyproject.toml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/pyproject.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_compressed.gif" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_compressed.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_lab_structure.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_lab_structure.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_logo_with_text_horizontal_blue.png" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/habitat_logo_with_text_horizontal_blue.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/tensorboard_video_demo.gif" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/res/img/tensorboard_video_demo.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/scripts/generate_profile_shell_scripts.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/scripts/generate_profile_shell_scripts.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/setup.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/setup.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/data/habitat-sim_trajectory_data.json" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/data/habitat-sim_trajectory_data.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/data/test-sim-geodesic-distance-test-golden.json" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/data/test-sim-geodesic-distance-test-golden.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_baseline_agents.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_baseline_agents.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_baseline_trainers.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_baseline_trainers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_ddppo_reduce.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_ddppo_reduce.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_demo_notebook.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_demo_notebook.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_examples.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_examples.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_sim.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_sim.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_habitat_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_install.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_install.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_mp3d_eqa.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_mp3d_eqa.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_object_nav_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_object_nav_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_pointnav_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_pointnav_dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_pyrobot.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_pyrobot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_r2r_vln.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_r2r_vln.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_rnn_state_encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_rnn_state_encoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_sensors.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_sensors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_spaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_spaces.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_tensor_dict.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_tensor_dict.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_visual_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_visual_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2HHtKFbY4FLeRI1ZUFJ4z1B0feh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e060521b-a459-49db-8503-b71e9ad01fc1" name="Changes" comment="" />
+      <created>1667953770415</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1667953770415</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
