@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7be87775-6c70-4e86-ab51-c1a79de6b226" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RocNet/ROctNetmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/RocNet/ROctNetmodel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/arguments.py" beforeDir="false" afterPath="$PROJECT_DIR$/arguments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/bug-report.md" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.github/ISSUE_TEMPLATE/bug-report.md" afterDir="false" />
@@ -247,8 +243,6 @@
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_spaces.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_spaces.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_tensor_dict.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_tensor_dict.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_visual_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/test/test_visual_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
