@@ -90,7 +90,7 @@ class Global_Policy(NNBase):
 
         x = nn.ReLU()(self.linear2(x))
 
-        return  x, rnn_hxs
+        return x, rnn_hxs
 
 
 # Visual Encoder (for RGB) model code
@@ -184,7 +184,7 @@ class RL_Policy(nn.Module):
     def forward(self, inputs, rnn_hxs, rgb, masks, extras):
         if extras is None:
             visual_feature = self.visual_encoder(rgb, masks)
-            return self.network(inputs, rnn_hxs, visual_feature , masks)
+            return self.network(inputs, rnn_hxs, visual_feature, masks)
         else:
             visual_feature = self.visual_encoder(rgb, masks)
             return self.network(inputs, rnn_hxs, visual_feature, masks, extras)
@@ -212,7 +212,7 @@ class RL_Policy(nn.Module):
                     action[e,1:] = dist.sample()
                 action_log_probs[e] = dist.log_probs(action[e,1:])
 
-        return  action, action_log_probs, rnn_hxs
+        return action, action_log_probs, rnn_hxs
 
 
     def predict_option_termination(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):

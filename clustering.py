@@ -9,7 +9,7 @@ from sklearn.cluster import DBSCAN # Density-Based Spatial Clustering of Applica
 from sklearn.cluster import AgglomerativeClustering
 import scipy.cluster.hierarchy as sch # importing scipy.cluster.hierarchy for dendrogram
 
-def frontier_clustering(data, algo="AGNES", metric=None, save_freq=None, num_ep_steps=1000):
+def frontier_clustering(data, data_form="map", algo="AGNES", metric=None, save_freq=None, ep_step=0):
 
     # initialization
     defaults = {"AGNES": {"type": 'hierarchical', "metric": 10, "n_clusters": 5, "linkage": 'ward', "dendrogram": None},
@@ -28,40 +28,63 @@ def frontier_clustering(data, algo="AGNES", metric=None, save_freq=None, num_ep_
     # clustering
     if algo == "DBSCAN":
         clusters = DBSCAN(eps=metric)
-
     elif algo == "AGNES":
         clusters = AgglomerativeClustering(n_clusters=n_clusters, affinity='euclidean', linkage=linkage)
+
+    print(f"frontier map channel is of type: {type(data)}, and of data-form: {data_form}")  # torch.Tensor or np.ndarray
+    if data_form == "map":
+        num_rows, num_cols = np.shape(data)[0], np.shape(data)[1]
+        data = map_to_columns(data, num_rows)
+    elif data_form == "columns":
+        num_rows = num_cols = np.amax(data)
     y_hc = clusters.fit_predict(data)  # model fitting on the dataset
 
+    # calculating cluster means
+    means_col = get_frontier_cluster_region_means(data, y_hc, n_clusters)
+    print(means_col)
+    means_map = columns_to_map(means_col, num_rows, num_cols)
+
     # plotting
-    if save_freq and (num_ep_steps % save_freq == 0):
+    if save_freq and (ep_step % save_freq == 0):
         plot_num = 1
-        cluster_save_path = f"clustering_output/clusterplot_{plot_num}"
-        visualize_clustering(data, y_hc, cluster_save_path)
+        cluster_save_path = f"clustering_output/clusterplot_{algo}_{plot_num}"
+        n_clusters = max(y_hc)+1
+        visualize_clustering(data, y_hc, means_col, n_clusters, cluster_save_path)
         if algo_type == 'hierarchical' and dendrogram:
-            dendro_save_path = f"clustering_output/dendroplot_{plot_num}"
+            dendro_save_path = f"clustering_output/dendroplot_{algo}_{plot_num}"
             hierarchical_dendrogram(data, linkage, dendro_save_path)
         plot_num += 1
 
-    means = get_frontier_cluster_region_means(data, y_hc, n_clusters)
+    return means_map
 
-    return means
 
+def map_to_columns(data, r):
+    columns = []
+    for i, row in enumerate(data):
+        for j, val in enumerate(row):
+            columns.append([j, r-1-i])
+    columns = np.array(columns)
+    return columns
+
+def columns_to_map(data, r, c):
+    map_out = np.zeros([r, c])
+    for i, row in enumerate(data):
+        map_out[r-1-int(row[1]), int(row[0])] = 1.
+    return map_out
 
 def get_frontier_cluster_region_means(data, y_hc, n_clusters):
 
     # full_map = torch.zeros(num_scenes, 5, full_w, full_h).float().to(device)
     # newData = ourData.iloc[:, [6, 7]].values # extract the two features from our dataset (for plots)
-    print(f"frontier map channel is of type: {type(data)}") # torch.Tensor or np.ndarray
-    data_out = np.zeros(data.size())
-    assert n_clusters == len(y_hc)
     # for each cluster, return the coordinates of the mean of all frontier coordinates in that cluster
+    column = np.zeros([n_clusters, 2])
     for clstr in range(n_clusters):
         cluster_coords_x, cluster_coords_y = data[y_hc == clstr, 0], data[y_hc == clstr, 1]
         cluster_mean_x, cluster_mean_y = np.mean(cluster_coords_x), np.mean(cluster_coords_y)
-        data_out[cluster_mean_x, cluster_mean_y] = 1.
+        cluster_mean_x, cluster_mean_y = int(round(cluster_mean_x,0)), int(round(cluster_mean_y,0))
+        column[clstr][0], column[clstr][1] = cluster_mean_x, cluster_mean_y
 
-    return data_out
+    return column
 
 # plotting dendrogram, also allows finding the optimal number of clusters
 def hierarchical_dendrogram(data, linkage, dendro_save_path):
@@ -75,11 +98,12 @@ def hierarchical_dendrogram(data, linkage, dendro_save_path):
     plt.close(fig)
 
 # VISUALIZING THE CLUSTERING
-def visualize_clustering(data, y_hc, n_clusters, cluster_save_path):
+def visualize_clustering(data, y_hc, means_col, n_clusters, cluster_save_path):
 
-    colours = ["red", "blue", "green", "cyan", "magenta"]
+    colours = ["red", "blue", "green", "cyan", "magenta", "yellow"]
     for clstr in range(n_clusters):
-        fig = plt.scatter(data[y_hc == clstr, 0], data[y_hc == clstr, 1], s=100, c=colours[clstr], label=f"cluster {clstr}")
+        plt.scatter(data[y_hc == clstr, 0], data[y_hc == clstr, 1], s=100, c=colours[clstr], label=f"cluster {clstr}")
+    plt.scatter(means_col[:, 0], means_col[:, 1], s=100, c=colours[clstr+1], label=f"cluster means")
     # plot additions
     plt.title('Frontier point clusters')
     plt.xlabel('X-axis')
@@ -87,4 +111,12 @@ def visualize_clustering(data, y_hc, n_clusters, cluster_save_path):
     plt.legend()
     plt.plot()
     plt.savefig(cluster_save_path)
-    plt.close(fig)
+    plt.close()
+
+if __name__ == "__main__":
+    # ourData = pd.read_csv('Pokemon.csv')
+    ourData = pd.read_csv('Mall_Customers.csv')
+    ourData.head()  # print the first five rows of our dataset
+    data = ourData.iloc[:, [3, 4]].values  # extract the two features from our dataset
+
+    frontier_clustering(data, data_form="columns", algo="AGNES", metric=None, save_freq=1)

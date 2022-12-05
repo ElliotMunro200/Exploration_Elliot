@@ -1,3 +1,7 @@
 /tmp
 /data
 *.csv
+/env/habitat/habitat_api
+/noise_models
+/clustering_output
+*.pyc

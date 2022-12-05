@@ -263,6 +263,7 @@ def main():
                                       'downscaling': args.global_downscaling
                                       }).to(device)
 
+    # wrapper that does PPO update on the actor critic.
     g_agent = algo.PPO(g_policy, args.clip_param, args.ppo_epoch,
                        args.num_mini_batch, args.value_loss_coef, args.termination_loss_coef,
                        args.entropy_coef, lr=args.global_lr, eps=args.eps,
@@ -382,11 +383,11 @@ def main():
         for step in range(args.max_episode_length):
             total_num_steps += 1
 
-            g_step = (step // args.num_local_steps) % args.num_global_steps
+            g_step = (step // args.num_local_steps) % args.num_global_steps # (0-999 // 50/25) % 20/40: 0-19/39
             eval_g_step = step + 1
 
             # ------------------------------------------------------------------
-            # option RL dicision making
+            # option RL decision making
             #print("local_step_count_rot")
             #print(local_step_count_rot)
             action = np.zeros(num_scenes)
@@ -395,7 +396,7 @@ def main():
                 if current_option[e] == 1: #rotate
                     if local_step_count[e] == 0: #reset rotation degree
                         cpu_actions = nn.Tanh()(g_action[e,0]).cpu().numpy() 
-                        local_step_count_rot[e] = int(cpu_actions * 180 / 10)
+                        local_step_count_rot[e] = int(cpu_actions * 180 / 10) # 0 -> 14
                         local_step_count[e] = args.num_local_steps
 
                     if local_step_count_rot[e] == 1 and local_step_count[e] > 1:
@@ -455,10 +456,10 @@ def main():
                     # Get short term goal
                     planner_inputs = [{} for en in range(num_scenes)]
                     for en, p_input in enumerate(planner_inputs):
-                        p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy()
-                        p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy()
+                        p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy() # occupancy map
+                        p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy() # explored map
                         p_input['pose_pred'] = planner_pose_inputs[en]
-                        p_input['goal'] = global_goals[e]#frontier_goals[e]
+                        p_input['goal'] = global_goals[e] # frontier_goals[e]
                         p_input['goal_arbitrary'] = global_goals[e]
                         p_input['change_goal'] = change_goal
                         p_input['active'] = True if en==e else False
@@ -682,7 +683,7 @@ def main():
 
                 
                 # Train Global Policy
-                if g_step % args.num_global_steps == args.num_global_steps - 1:
+                if g_step % args.num_global_steps == args.num_global_steps - 1: # true from step 975/950 (local=25/50) = the start of the last macro-action
                     print("#######Training Global Policy#######")
                     
                     g_next_value, g_terminations = g_policy.get_value(

@@ -1,0 +1,9 @@
+README.md
+setup.py
+torchfold/__init__.py
+torchfold/torchfold.py
+torchfold/torchfold_test.py
+torchfold.egg-info/PKG-INFO
+torchfold.egg-info/SOURCES.txt
+torchfold.egg-info/dependency_links.txt
+torchfold.egg-info/top_level.txt

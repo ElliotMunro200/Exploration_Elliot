@@ -79,7 +79,6 @@ class Exploration_Env(habitat.RLEnv):
         self.dt = 10
 
         self.rank = rank
-
         self.sensor_noise_fwd = \
                 pickle.load(open("noise_models/sensor_noise_fwd.pkl", 'rb'))
         self.sensor_noise_right = \
