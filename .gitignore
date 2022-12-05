@@ -1,6 +1,5 @@
 /tmp
 /data
 *.csv
-/noise_models
-/clustering_output
+/clustering_output/*
 *.pyc
