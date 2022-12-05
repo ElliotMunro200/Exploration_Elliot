@@ -9,7 +9,7 @@ from sklearn.cluster import DBSCAN # Density-Based Spatial Clustering of Applica
 from sklearn.cluster import AgglomerativeClustering
 import scipy.cluster.hierarchy as sch # importing scipy.cluster.hierarchy for dendrogram
 
-def frontier_clustering(data, data_form="map", algo="AGNES", metric=None, save_freq=None, ep_step=0):
+def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, save_freq=None):
 
     # initialization
     defaults = {"AGNES": {"type": 'hierarchical', "metric": 10, "n_clusters": 5, "linkage": 'ward', "dendrogram": None},
@@ -45,7 +45,7 @@ def frontier_clustering(data, data_form="map", algo="AGNES", metric=None, save_f
     means_map = columns_to_map(means_col, num_rows, num_cols)
 
     # plotting
-    if save_freq and (ep_step % save_freq == 0):
+    if save_freq and (step % save_freq == 0):
         plot_num = 1
         cluster_save_path = f"clustering_output/clusterplot_{algo}_{plot_num}"
         n_clusters = max(y_hc)+1
@@ -58,11 +58,11 @@ def frontier_clustering(data, data_form="map", algo="AGNES", metric=None, save_f
     return means_map
 
 
-def map_to_columns(data, r):
+def map_to_columns(data, num_rows):
     columns = []
     for i, row in enumerate(data):
         for j, val in enumerate(row):
-            columns.append([j, r-1-i])
+            columns.append([j, num_rows-1-i])
     columns = np.array(columns)
     return columns
 
@@ -118,5 +118,6 @@ if __name__ == "__main__":
     ourData = pd.read_csv('Mall_Customers.csv')
     ourData.head()  # print the first five rows of our dataset
     data = ourData.iloc[:, [3, 4]].values  # extract the two features from our dataset
+    step = 0
 
-    frontier_clustering(data, data_form="columns", algo="AGNES", metric=None, save_freq=1)
+    frontier_clustering(data, step, data_form="columns", algo="AGNES", metric=None, save_freq=1)

@@ -42,13 +42,13 @@ class TreeClassifier(nn.Module):
 
 class BoxEncoder(nn.Module):
 
-    def __init__(self, input_size, feature_size):
+    def __init__(self, num_maps, input_size, feature_size):
         super(BoxEncoder, self).__init__()
         self.encoder = nn.Linear(feature_size, feature_size)
         
         
         #2d conv layer1
-        self.conv1 = nn.Conv2d(5, 16, kernel_size=3, stride=2, bias=True, padding=1)
+        self.conv1 = nn.Conv2d(num_maps, 16, kernel_size=3, stride=2, bias=True, padding=1)
         self.bn1 = nn.BatchNorm2d(16)
         
         

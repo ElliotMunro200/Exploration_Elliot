@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7be87775-6c70-4e86-ab51-c1a79de6b226" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/Exploration_Elliot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Exploration.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RocNet/ROctNetmodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/RocNet/ROctNetmodel.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/arguments.py" beforeDir="false" afterPath="$PROJECT_DIR$/arguments.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clustering.py" beforeDir="false" afterPath="$PROJECT_DIR$/clustering.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/habitat/exploration_env.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/exploration_env.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.circleci/config.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/env/habitat/habitat_api/.editorconfig" afterDir="false" />
@@ -271,13 +267,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

@@ -22,7 +22,7 @@ class Global_Policy(NNBase):
         super(Global_Policy, self).__init__(recurrent, hidden_size,
                                             hidden_size)
 
-        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.)
+        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.) # input_shape = (num_maps, local_w, local_h)
 
 
         config = get_args()
@@ -49,8 +49,8 @@ class Global_Policy(NNBase):
         
 
         self.encoder = ROctEncoder(config)
-        self.box_encoder = BoxEncoder(input_size = config.box_code_size, feature_size = config.feature_size)
-        self.tree_classifier = TreeClassifier(feature_size = config.feature_size, hidden_size = config.hidden_size)
+        self.box_encoder = BoxEncoder(num_maps=input_shape[0], input_size=config.box_code_size, feature_size=config.feature_size)
+        self.tree_classifier = TreeClassifier(feature_size=config.feature_size, hidden_size=config.hidden_size)
 
         self.linear1 = nn.Linear(config.feature_size + 8 + 512, hidden_size)
         self.linear2 = nn.Linear(hidden_size, 256)

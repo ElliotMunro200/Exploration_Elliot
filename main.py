@@ -16,12 +16,13 @@ import gym
 import logging
 from arguments import get_args
 from env import make_vec_envs
-#from clustering import frontier_clustering
+
 from utils.storage import GlobalRolloutStorage #, FIFOMemory
 #from utils.optimization import get_optimizer
-from model import RL_Policy 
 
 import algo
+from model import RL_Policy
+from clustering import frontier_clustering
 
 import sys
 import matplotlib
@@ -51,7 +52,7 @@ def get_frontier_map(map_gt, explored_gt, visited_gt, bad_frontier_map):
     explored_gt = explored_gt.detach().cpu().numpy()
     visited_gt = visited_gt.detach().cpu().numpy()
 
-    selem = morphology.disk(5)
+    selem = morphology.disk(5) # 5 is the radius of the flat, disk-shaped footprint
 
     contour = binary_dilation(explored_gt==0, selem) & (explored_gt==1)
     contour = contour & (binary_dilation(map_gt, selem)==0)
@@ -135,7 +136,7 @@ def main():
 
     #plots
     plt.ion()
-    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke")
+    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke") # plotting terminations, values, options and their losses.
     plt.pause(0.001)
 
     if args.eval:
@@ -162,15 +163,17 @@ def main():
     # Starting environments
     torch.set_num_threads(1)
     envs = make_vec_envs(args)
-    obs, infos = envs.reset()
+    obs, infos = envs.reset() # the obs here is rgb
 
     # Initialize map variables
-    ### Full map consists of 5 channels containing the following:
+    ### Full map consists of 5 or 6 channels containing the following:
     ### 0. Obstacle Map
     ### 1. Exploread Area
     ### 2. Current Agent Location
     ### 3. Past Agent Locations
     ### 4. Frontier Map
+    ### 5. [Frontier Map cluster centroids]
+    num_maps = args.num_maps
 
     torch.set_grad_enabled(False)
 
@@ -181,8 +184,8 @@ def main():
                        int(full_h / args.global_downscaling)
 
     # Initializing full and local map
-    full_map = torch.zeros(num_scenes, 5, full_w, full_h).float().to(device)
-    local_map = torch.zeros(num_scenes, 5, local_w, local_h).float().to(device)
+    full_map = torch.zeros(num_scenes, num_maps, full_w, full_h).float().to(device)
+    local_map = torch.zeros(num_scenes, num_maps, local_w, local_h).float().to(device)
     bad_frontier_map = np.zeros((num_scenes, 1, local_w, local_h))
 
     # Initial full and local pose
@@ -234,7 +237,7 @@ def main():
 
     # Occupancy map observation space
     map_observation_space = gym.spaces.Box(0, 1,
-                                         (5,
+                                         (num_maps,
                                           local_w,
                                           local_h), dtype='uint8')
 
@@ -298,7 +301,7 @@ def main():
 
     # Compute Global policy input
     locs = local_pose.cpu().numpy()
-    global_input = torch.zeros(num_scenes, 5, local_w, local_h)
+    global_input = torch.zeros(num_scenes, num_maps, local_w, local_h)
     global_orientation = torch.zeros(num_scenes, 1).long()
 
     for e in range(num_scenes):
@@ -309,7 +312,7 @@ def main():
         local_map[e, 2:, loc_r - 1:loc_r + 2, loc_c - 1:loc_c + 2] = 1.
         global_orientation[e] = int((locs[e, 2] + 180.0) / 5.)
 
-    global_input[:, 0:5, :, :] = local_map.detach()
+    global_input[:, 0:num_maps, :, :] = local_map.detach()
     #global_input[:, 4:, :, :] = nn.MaxPool2d(args.global_downscaling)(full_map)
 
 
@@ -567,7 +570,9 @@ def main():
                     global_orientation[e] = int((locs[e, 2] + 180.0) / 5.)
                     local_map[e, 4] = get_frontier_map(local_map[e, 0, :, :].detach(), \
                         local_map[e, 1, :, :].detach(), local_map[e, 3, :, :].detach(), bad_frontier_map[e,0,:,:])
-
+                    if num_maps >= 6:
+                        local_map[e, 5] = frontier_clustering(local_map[e, 4, :, :].detach(), \
+                            step, algo="AGNES", metric=None, save_freq=None)
                 global_input = local_map
                 #global_input[:, 4:, :, :] = \
                 #    nn.MaxPool2d(args.global_downscaling)(full_map)
