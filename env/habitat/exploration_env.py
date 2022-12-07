@@ -33,7 +33,7 @@ from habitat import logger
 from env.utils.map_builder import MapBuilder
 from env.utils.fmm_planner import FMMPlanner
 
-from env.habitat.utils.noisy_actions import CustomActionSpaceConfiguration
+#from env.habitat.utils.noisy_actions import CustomActionSpaceConfiguration
 
 from env.habitat.utils import pose as pu
 from env.habitat.utils import visualizations as vu
