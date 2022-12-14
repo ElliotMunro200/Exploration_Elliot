@@ -16,11 +16,13 @@ import gym
 import logging
 from arguments import get_args
 from env import make_vec_envs
+
 from utils.storage import GlobalRolloutStorage #, FIFOMemory
 #from utils.optimization import get_optimizer
-from model import RL_Policy 
 
 import algo
+from model import RL_Policy
+from clustering import frontier_clustering
 
 import sys
 import matplotlib
@@ -46,17 +48,17 @@ if args.cuda:
 
 def get_frontier_map(map_gt, explored_gt, visited_gt, bad_frontier_map):
 
-    map_gt = map_gt.detach().cpu().numpy()
-    explored_gt = explored_gt.detach().cpu().numpy()
-    visited_gt = visited_gt.detach().cpu().numpy()
+    map_gt = map_gt.detach().cpu().numpy() # obstacle map
+    explored_gt = explored_gt.detach().cpu().numpy() # explored map
+    visited_gt = visited_gt.detach().cpu().numpy() # visited/trajectory map
 
-    selem = morphology.disk(5)
-
-    contour = binary_dilation(explored_gt==0, selem) & (explored_gt==1)
-    contour = contour & (binary_dilation(map_gt, selem)==0)
-    contour = contour & (binary_dilation(visited_gt, morphology.disk(1))==0)
-    contour = contour & (binary_dilation(bad_frontier_map, morphology.disk(1))==0)
-    contour = morphology.remove_small_objects(contour, 2)
+    selem = morphology.disk(5) # 5 is the radius of the flat, disk-shaped footprint
+    # binary dilation expands the non-zero values of an image by the structuring element (selem) as its center passes through the non-zero elements
+    contour = binary_dilation(explored_gt==0, selem) & (explored_gt==1) # frontier points (dilated by selem)
+    contour = contour & (binary_dilation(map_gt, selem)==0) # same as above, but removing points near obstacles with selem
+    contour = contour & (binary_dilation(visited_gt, morphology.disk(1))==0) # removing points previously visited with disc(rad=1)
+    contour = contour & (binary_dilation(bad_frontier_map, morphology.disk(1))==0) # removing points in the bad frontier map
+    contour = morphology.remove_small_objects(contour, 2) # removing clusters (square connectivity) of size less than 2
     
     '''
     global counter
@@ -134,7 +136,7 @@ def main():
 
     #plots
     plt.ion()
-    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke")
+    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke") # plotting terminations, values, options and their losses.
     plt.pause(0.001)
 
     if args.eval:
@@ -161,15 +163,17 @@ def main():
     # Starting environments
     torch.set_num_threads(1)
     envs = make_vec_envs(args)
-    obs, infos = envs.reset()
+    obs, infos = envs.reset() # the obs here is rgb
 
     # Initialize map variables
-    ### Full map consists of 5 channels containing the following:
+    ### Full map consists of 5 or 6 channels containing the following:
     ### 0. Obstacle Map
     ### 1. Exploread Area
     ### 2. Current Agent Location
     ### 3. Past Agent Locations
     ### 4. Frontier Map
+    ### 5. [Frontier Map cluster centroids]
+    num_maps = args.num_maps
 
     torch.set_grad_enabled(False)
 
@@ -180,8 +184,8 @@ def main():
                        int(full_h / args.global_downscaling)
 
     # Initializing full and local map
-    full_map = torch.zeros(num_scenes, 5, full_w, full_h).float().to(device)
-    local_map = torch.zeros(num_scenes, 5, local_w, local_h).float().to(device)
+    full_map = torch.zeros(num_scenes, num_maps, full_w, full_h).float().to(device)
+    local_map = torch.zeros(num_scenes, num_maps, local_w, local_h).float().to(device)
     bad_frontier_map = np.zeros((num_scenes, 1, local_w, local_h))
 
     # Initial full and local pose
@@ -233,7 +237,7 @@ def main():
 
     # Occupancy map observation space
     map_observation_space = gym.spaces.Box(0, 1,
-                                         (5,
+                                         (num_maps,
                                           local_w,
                                           local_h), dtype='uint8')
 
@@ -257,12 +261,13 @@ def main():
                          rgb_observation_space.shape,
                          hidden_size=l_hidden_size,
                          use_deterministic_local=args.use_deterministic_local,
-			 device=args.device,
+                         device=args.device,
                          base_kwargs={'recurrent': args.use_recurrent_global,
                                       'hidden_size': g_hidden_size,
                                       'downscaling': args.global_downscaling
                                       }).to(device)
 
+    # wrapper that does PPO update on the actor critic.
     g_agent = algo.PPO(g_policy, args.clip_param, args.ppo_epoch,
                        args.num_mini_batch, args.value_loss_coef, args.termination_loss_coef,
                        args.entropy_coef, lr=args.global_lr, eps=args.eps,
@@ -297,7 +302,7 @@ def main():
 
     # Compute Global policy input
     locs = local_pose.cpu().numpy()
-    global_input = torch.zeros(num_scenes, 5, local_w, local_h)
+    global_input = torch.zeros(num_scenes, num_maps, local_w, local_h)
     global_orientation = torch.zeros(num_scenes, 1).long()
 
     for e in range(num_scenes):
@@ -308,7 +313,7 @@ def main():
         local_map[e, 2:, loc_r - 1:loc_r + 2, loc_c - 1:loc_c + 2] = 1.
         global_orientation[e] = int((locs[e, 2] + 180.0) / 5.)
 
-    global_input[:, 0:5, :, :] = local_map.detach()
+    global_input[:, 0:num_maps, :, :] = local_map.detach()
     #global_input[:, 4:, :, :] = nn.MaxPool2d(args.global_downscaling)(full_map)
 
 
@@ -382,11 +387,11 @@ def main():
         for step in range(args.max_episode_length):
             total_num_steps += 1
 
-            g_step = (step // args.num_local_steps) % args.num_global_steps
+            g_step = (step // args.num_local_steps) % args.num_global_steps # (0-999 // 50/25) % 20/40: 0-19/39
             eval_g_step = step + 1
 
             # ------------------------------------------------------------------
-            # option RL dicision making
+            # option RL decision making
             #print("local_step_count_rot")
             #print(local_step_count_rot)
             action = np.zeros(num_scenes)
@@ -395,7 +400,7 @@ def main():
                 if current_option[e] == 1: #rotate
                     if local_step_count[e] == 0: #reset rotation degree
                         cpu_actions = nn.Tanh()(g_action[e,0]).cpu().numpy() 
-                        local_step_count_rot[e] = int(cpu_actions * 180 / 10)
+                        local_step_count_rot[e] = int(cpu_actions * 180 / 10) # 0 -> 14
                         local_step_count[e] = args.num_local_steps
 
                     if local_step_count_rot[e] == 1 and local_step_count[e] > 1:
@@ -455,10 +460,10 @@ def main():
                     # Get short term goal
                     planner_inputs = [{} for en in range(num_scenes)]
                     for en, p_input in enumerate(planner_inputs):
-                        p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy()
-                        p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy()
+                        p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy() # occupancy map
+                        p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy() # explored map
                         p_input['pose_pred'] = planner_pose_inputs[en]
-                        p_input['goal'] = global_goals[e]#frontier_goals[e]
+                        p_input['goal'] = global_goals[e] # frontier_goals[e]
                         p_input['goal_arbitrary'] = global_goals[e]
                         p_input['change_goal'] = change_goal
                         p_input['active'] = True if en==e else False
@@ -566,7 +571,9 @@ def main():
                     global_orientation[e] = int((locs[e, 2] + 180.0) / 5.)
                     local_map[e, 4] = get_frontier_map(local_map[e, 0, :, :].detach(), \
                         local_map[e, 1, :, :].detach(), local_map[e, 3, :, :].detach(), bad_frontier_map[e,0,:,:])
-
+                    if num_maps >= 6:
+                        local_map[e, 5] = frontier_clustering(local_map[e, 4, :, :].detach(), \
+                            step, algo="AGNES", metric=None, save_freq=None)
                 global_input = local_map
                 #global_input[:, 4:, :, :] = \
                 #    nn.MaxPool2d(args.global_downscaling)(full_map)
@@ -670,7 +677,7 @@ def main():
                 print("g_value")
                 print(g_value)
 
-                print("Timer for phase 5")
+                print("Timer for phase 6")
                 timer.toc()
                 timer.tic()
             #g_reward = torch.from_numpy(np.zeros((num_scenes))).float().to(device)
@@ -682,7 +689,7 @@ def main():
 
                 
                 # Train Global Policy
-                if g_step % args.num_global_steps == args.num_global_steps - 1:
+                if g_step % args.num_global_steps == args.num_global_steps - 1: # true from step 975/950 (local=25/50) = the start of the last macro-action
                     print("#######Training Global Policy#######")
                     
                     g_next_value, g_terminations = g_policy.get_value(

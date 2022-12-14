@@ -45,10 +45,11 @@ class BoxEncoder(nn.Module):
     def __init__(self, num_maps, input_size, feature_size):
         super(BoxEncoder, self).__init__()
         self.encoder = nn.Linear(feature_size, feature_size)
+        self.num_maps = num_maps
         
         
         #2d conv layer1
-        self.conv1 = nn.Conv2d(num_maps, 16, kernel_size=3, stride=2, bias=True, padding=1)
+        self.conv1 = nn.Conv2d(self.num_maps, 16, kernel_size=3, stride=2, bias=True, padding=1)
         self.bn1 = nn.BatchNorm2d(16)
         
         
@@ -193,7 +194,7 @@ class ROctEncoder(nn.Module):
 
     def __init__(self, config):
         super(ROctEncoder, self).__init__()
-        self.box_encoder = BoxEncoder(input_size = config.box_code_size, feature_size = config.feature_size)
+        self.box_encoder = BoxEncoder(num_maps = config.num_maps, input_size = config.box_code_size, feature_size = config.feature_size)
         self.box_encoder2 = BoxEncoder2(input_size = config.box_code_size, feature_size = config.feature_size)
         
         self.adj_encoder1 = AdjEncoder(feature_size = config.feature_size, hidden_size = config.hidden_size)

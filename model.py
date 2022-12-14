@@ -22,7 +22,7 @@ class Global_Policy(NNBase):
         super(Global_Policy, self).__init__(recurrent, hidden_size,
                                             hidden_size)
 
-        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.) # input_shape = (num_maps, local_w, local_h)
+        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.)
 
 
         config = get_args()
@@ -46,11 +46,12 @@ class Global_Policy(NNBase):
         config.batch_size = 100
         incre = 1000
         config.epochs = 50
+        config.num_maps = input_shape[0]
         
 
         self.encoder = ROctEncoder(config)
-        self.box_encoder = BoxEncoder(num_maps=input_shape[0], input_size=config.box_code_size, feature_size=config.feature_size)
-        self.tree_classifier = TreeClassifier(feature_size=config.feature_size, hidden_size=config.hidden_size)
+        self.box_encoder = BoxEncoder(num_maps=config.num_maps, input_size = config.box_code_size, feature_size = config.feature_size)
+        self.tree_classifier = TreeClassifier(feature_size = config.feature_size, hidden_size = config.hidden_size)
 
         self.linear1 = nn.Linear(config.feature_size + 8 + 512, hidden_size)
         self.linear2 = nn.Linear(hidden_size, 256)
@@ -90,7 +91,7 @@ class Global_Policy(NNBase):
 
         x = nn.ReLU()(self.linear2(x))
 
-        return x, rnn_hxs
+        return  x, rnn_hxs
 
 
 # Visual Encoder (for RGB) model code
@@ -144,7 +145,7 @@ class Visual_Encoder(NNBase):
 class RL_Policy(nn.Module):
 
     def __init__(self, obs_shape, action_space_discrete, action_space_box,
-                  observation_space_shape, hidden_size, use_deterministic_local, model_type=0, base_kwargs=None):
+                  observation_space_shape, hidden_size, use_deterministic_local, device, model_type=0, base_kwargs=None):
 
         super(RL_Policy, self).__init__()
         if base_kwargs is None:
@@ -168,9 +169,9 @@ class RL_Policy(nn.Module):
 
         self.critic_linear = nn.Linear(256, 2) #value
         self.terminations = nn.Linear(256, 2)  #termination probabilty
-
         self.model_type = model_type
         self.num_steps = 0
+        self.device = device
 
     @property
     def is_recurrent(self):
@@ -184,7 +185,7 @@ class RL_Policy(nn.Module):
     def forward(self, inputs, rnn_hxs, rgb, masks, extras):
         if extras is None:
             visual_feature = self.visual_encoder(rgb, masks)
-            return self.network(inputs, rnn_hxs, visual_feature, masks)
+            return self.network(inputs, rnn_hxs, visual_feature , masks)
         else:
             visual_feature = self.visual_encoder(rgb, masks)
             return self.network(inputs, rnn_hxs, visual_feature, masks, extras)
@@ -192,8 +193,8 @@ class RL_Policy(nn.Module):
     def act(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
         
-        action_log_probs = torch.zeros(len(option)).to('cuda:0')
-        action = torch.zeros(len(option),3).to('cuda:0')
+        action_log_probs = torch.zeros(len(option)).to(self.device)
+        action = torch.zeros(len(option),3).to(self.device)
 
         for e in range(len(option)):
 
@@ -212,7 +213,7 @@ class RL_Policy(nn.Module):
                     action[e,1:] = dist.sample()
                 action_log_probs[e] = dist.log_probs(action[e,1:])
 
-        return action, action_log_probs, rnn_hxs
+        return  action, action_log_probs, rnn_hxs
 
 
     def predict_option_termination(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
@@ -247,7 +248,7 @@ class RL_Policy(nn.Module):
         #value = torch.index_select(value, 1, torch.LongTensor([1,0]).to('cuda:0'))
         #terminations = torch.index_select(terminations, 1, torch.LongTensor([1,0]).to('cuda:0'))
 
-        action_log_probs = torch.zeros(len(option)).to('cuda:0')
+        action_log_probs = torch.zeros(len(option)).to(self.device)
         dist_entropy = 0
         for e in range(len(option)):
 

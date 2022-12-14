@@ -32,18 +32,22 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
         clusters = AgglomerativeClustering(n_clusters=n_clusters, affinity='euclidean', linkage=linkage)
 
     print(f"frontier map channel is of type: {type(data)}, and of data-form: {data_form}")  # torch.Tensor or np.ndarray
+    print(f"DATA_IN_SHAPE: {data.shape}")
     if data_form == "map":
         num_rows, num_cols = np.shape(data)[0], np.shape(data)[1]
         data = map_to_columns(data, num_rows)
     elif data_form == "columns":
         num_rows = num_cols = np.amax(data)
+    print(f"DATA_MID_SHAPE: {data.shape}")
     y_hc = clusters.fit_predict(data)  # model fitting on the dataset
 
     # calculating cluster means
     means_col = get_frontier_cluster_region_means(data, y_hc, n_clusters)
     print(means_col)
     means_map = columns_to_map(means_col, num_rows, num_cols)
-
+	
+    print(f"DATA_OUT_SHAPE: {means_map.shape}")
+    
     # plotting
     if save_freq and (step % save_freq == 0):
         plot_num = 1
@@ -54,7 +58,7 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
             dendro_save_path = f"clustering_output/dendroplot_{algo}_{plot_num}"
             hierarchical_dendrogram(data, linkage, dendro_save_path)
         plot_num += 1
-
+	
     return means_map
 
 

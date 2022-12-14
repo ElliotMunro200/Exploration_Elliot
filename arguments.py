@@ -10,8 +10,8 @@ def get_args():
     parser.add_argument('--seed', type=int, default=1,
                         help='random seed (default: 1)')
     parser.add_argument('--auto_gpu_config', type=int, default=0)
-    parser.add_argument('--num_maps', type=int, default=5)
     parser.add_argument('--total_num_scenes', type=str, default="auto")
+    parser.add_argument('--num_maps', type=int, default=5) #
     parser.add_argument('-n', '--num_processes', type=int, default=4,
                         help="""how many training processes to use (default:4)
                                 Overridden when auto_gpu_config=1
@@ -39,9 +39,6 @@ def get_args():
     parser.add_argument('--train_slam', type=int, default=1,
                         help="""0: Do not train the Neural SLAM Module
                                 1: Train the Neural SLAM Module (default: 1)""")
-    parser.add_argument('--frontier_cluster_mean_goals', type=int, default=1,
-                        help="""0: Do not use frontier cluster means as goals
-                                    1: Do use frontier cluster means as goals (default: 1)""")
 
     # Logging, loading models, visualization
     parser.add_argument('--log_interval', type=int, default=10,
@@ -106,7 +103,7 @@ def get_args():
     parser.add_argument('--global_lr', type=float, default=2.5e-5, #2.5e-5
                         help='global learning rate (default: 2.5e-5)')
     parser.add_argument('--global_hidden_size', type=int, default=256,
-                        help='global_hidden_size')
+                        help='local_hidden_size')
     parser.add_argument('--eps', type=float, default=1e-5,
                         help='RL Optimizer epsilon (default: 1e-5)')
     parser.add_argument('--alpha', type=float, default=0.99,
@@ -125,7 +122,7 @@ def get_args():
                         help='value loss coefficient (default: 0.5)')
     parser.add_argument('--max_grad_norm', type=float, default=0.5,
                         help='max norm of gradients (default: 0.5)')
-    parser.add_argument('--num_global_steps', type=int, default=20,# 40
+    parser.add_argument('--num_global_steps', type=int, default=20,#40
                         help='number of forward steps in A2C (default: 5)')
     parser.add_argument('--ppo_epoch', type=int, default=4,
                         help='number of ppo epochs (default: 4)')
@@ -139,7 +136,7 @@ def get_args():
     # Visual Encoder
     parser.add_argument('--visual_optimizer', type=str,
                         default='adam,lr=0.0001')
-    parser.add_argument('--num_local_steps', type=int, default=50, # 25?
+    parser.add_argument('--num_local_steps', type=int, default=50,
                         help="""Number of steps the local can
                             perform between each global instruction""")
     parser.add_argument('--local_hidden_size', type=int, default=512,

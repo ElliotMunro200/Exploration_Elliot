@@ -33,7 +33,7 @@ from habitat import logger
 from env.utils.map_builder import MapBuilder
 from env.utils.fmm_planner import FMMPlanner
 
-#from env.habitat.utils.noisy_actions import CustomActionSpaceConfiguration
+from env.habitat.utils.noisy_actions import CustomActionSpaceConfiguration
 
 from env.habitat.utils import pose as pu
 from env.habitat.utils import visualizations as vu
@@ -79,6 +79,7 @@ class Exploration_Env(habitat.RLEnv):
         self.dt = 10
 
         self.rank = rank
+
         self.sensor_noise_fwd = \
                 pickle.load(open("noise_models/sensor_noise_fwd.pkl", 'rb'))
         self.sensor_noise_right = \
