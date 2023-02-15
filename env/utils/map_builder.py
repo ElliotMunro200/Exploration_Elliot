@@ -3,6 +3,7 @@ import numpy as np
 import env.utils.depth_utils as du
 from scipy.ndimage.morphology import binary_dilation
 from skimage import morphology
+from clustering import frontier_clustering
 
 class MapBuilder(object):
     def __init__(self, params):
@@ -17,13 +18,14 @@ class MapBuilder(object):
         self.vision_range = params['vision_range']
 
         self.map_size_cm = params['map_size_cm']
-        self.resolution = params['resolution']
-        agent_min_z = params['agent_min_z']
-        agent_max_z = params['agent_max_z']
+        self.resolution = params['resolution'] #5
+        agent_min_z = params['agent_min_z'] #25
+        agent_max_z = params['agent_max_z'] #150
         self.z_bins = [agent_min_z, agent_max_z]
         self.du_scale = params['du_scale']
         self.visualize = params['visualize']
         self.obs_threshold = params['obs_threshold']
+        self.num_maps = params['num_maps']
 
         self.map = np.zeros((self.map_size_cm // self.resolution,
                              self.map_size_cm // self.resolution,
@@ -69,9 +71,9 @@ class MapBuilder(object):
             self.z_bins,
             self.resolution)
 
-        self.map = self.map + geocentric_flat
+        self.map = self.map + geocentric_flat 
 
-        map_gt = self.map[:, :, 1] / self.obs_threshold
+        map_gt = self.map[:, :, 1] / self.obs_threshold #(=1), map_gt = occupancy map
         map_gt[map_gt >= 0.5] = 1.0
         map_gt[map_gt < 0.5] = 0.0
 
@@ -86,8 +88,17 @@ class MapBuilder(object):
         contour = binary_dilation(explored_gt==0, k) & (explored_gt==1)
         contour = contour & (binary_dilation(map_gt, k)==0)
         contour = morphology.remove_small_objects(contour, 2)
+        
+        num_frontier_points = len(np.nonzero(contour)[0])
+        if self.num_maps == 5:
+            frontier_clusters = np.zeros(np.shape(contour))
+        elif num_frontier_points < 5:
+            print(f"ONLY {num_frontier_points} FRONTIER POINTS, SO NOT ENOUGH FOR CLUSTERING")
+            frontier_clusters = np.zeros(np.shape(contour))
+        else:
+            frontier_clusters = frontier_clustering(contour, step=0, algo="AGNES", metric=None, save_freq=None)
 
-        return agent_view_cropped, map_gt, agent_view_explored, explored_gt, new_explored, contour.astype(float)
+        return agent_view_cropped, map_gt, agent_view_explored, explored_gt, new_explored, contour.astype(float), frontier_clusters
 
     def get_st_pose(self, current_loc):
         loc = [- (current_loc[0] / self.resolution

@@ -3,3 +3,4 @@
 *.csv
 /clustering_output/*
 *.pyc
+/exp_data

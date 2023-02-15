@@ -29,11 +29,10 @@ class RolloutStorage(object):
         self.rec_states = torch.zeros(num_steps + 1, num_processes,
                                       rec_state_size)
         self.rewards = torch.zeros(num_steps, num_processes)
-        self.value_preds = torch.zeros(num_steps + 1, num_processes, 2)
+        self.value_preds = torch.zeros(num_steps + 1, num_processes, 1)
         self.returns = torch.zeros(num_steps + 1, num_processes)
         self.option = torch.zeros(num_steps + 1, num_processes)
         self.is_intermediate = torch.zeros(num_steps + 1, num_processes)
-        self.terminations = torch.zeros(num_steps + 1, num_processes, 2)
         self.action_log_probs = torch.zeros(num_steps, num_processes)
         self.actions_discrete = torch.zeros((num_steps, num_processes, self.n_actions1),
                                    dtype=action_type1)
@@ -54,7 +53,6 @@ class RolloutStorage(object):
         self.rewards = self.rewards.to(device)
         self.value_preds = self.value_preds.to(device)
         self.option = self.option.to(device)
-        self.terminations = self.terminations.to(device)
         self.returns = self.returns.to(device)
         self.action_log_probs = self.action_log_probs.to(device)
         self.actions_discrete = self.actions_discrete.to(device)
@@ -64,22 +62,15 @@ class RolloutStorage(object):
             self.extras = self.extras.to(device)
         return self
 
-    def insert(self, obs, rgb, rec_states, actions, action_log_probs, value_preds, option, terminations,
+    def insert(self, obs, rgb, rec_states, actions, action_log_probs, value_preds, option,
                rewards, masks):
         self.obs[self.step + 1].copy_(obs)
         self.rgb[self.step + 1].copy_(rgb)
         self.rec_states[self.step + 1].copy_(rec_states)
-        
-        for e in range(len(option)):
-            if option[e] == 1: #rotate
-                self.actions_discrete[self.step,e].copy_(actions[e,0].view(-1))
-            else:
-                self.actions_box[self.step,e].copy_(actions[e,1:].view(-1))
-
+        self.actions_discrete[self.step].copy_(actions[0].view(-1))
         self.action_log_probs[self.step].copy_(action_log_probs)
         self.value_preds[self.step].copy_(value_preds)
         self.option[self.step].copy_(torch.from_numpy(option).view(-1))
-        self.terminations[self.step].copy_(terminations)
         self.rewards[self.step].copy_(rewards)
         self.masks[self.step + 1].copy_(masks)
 
@@ -93,13 +84,10 @@ class RolloutStorage(object):
         if self.has_extras:
             self.extras[0].copy_(self.extras[-1])
 
-    def compute_returns(self, gamma, next_value, next_terminations):
+    def compute_returns(self, gamma, next_value):
         #collect rewards of path-planning steps
         for e in range(self.num_processes):
-            self.returns[-1,e] = ((1-next_terminations[e,int(self.option[-1,e])].detach()) * \
-                                  next_value[e,int(self.option[-1,e])].detach() + \
-                                  next_terminations[e,int(self.option[-1,e])].detach() * \
-                                  next_value[e].max(dim=-1)[0].detach())
+            self.returns[-1,e] = (next_value[e].max(dim=-1)[0].detach())
 
         for step in reversed(range(self.rewards.size(0))):
             self.returns[step] = self.returns[step + 1] * gamma \
@@ -129,7 +117,6 @@ class RolloutStorage(object):
                 'actions_discrete': self.actions_discrete.view(-1, self.n_actions1)[indices],
                 'actions_box': self.actions_box.view(-1, self.n_actions2)[indices],
                 'value_preds': self.value_preds[:-1].view(-1)[indices],
-                'terminations': self.terminations[:-1].view(-1)[indices],
                 'returns': self.returns[:-1].view(-1)[indices],
                 'masks': self.masks[:-1].view(-1)[indices],
                 'old_action_log_probs': self.action_log_probs.view(-1)[indices],
@@ -159,7 +146,6 @@ class RolloutStorage(object):
             actions_discrete = []
             actions_box = []
             value_preds = []
-            terminations = []
             returns = []
             masks = []
             old_action_log_probs = []
@@ -178,7 +164,6 @@ class RolloutStorage(object):
                 actions_discrete.append(self.actions_discrete[:, ind])
                 actions_box.append(self.actions_box[:, ind])
                 value_preds.append(self.value_preds[:-1, ind])
-                terminations.append(self.terminations[:-1, ind])
                 returns.append(self.returns[:-1, ind])
                 masks.append(self.masks[:-1, ind])
                 old_action_log_probs.append(self.action_log_probs[:, ind])
@@ -196,7 +181,6 @@ class RolloutStorage(object):
             actions_discrete = torch.stack(actions_discrete, 1)
             actions_box = torch.stack(actions_box, 1)
             value_preds = torch.stack(value_preds, 1)
-            terminations = torch.stack(terminations, 1)
             returns = torch.stack(returns, 1)
             masks = torch.stack(masks, 1)
             old_action_log_probs = torch.stack(old_action_log_probs, 1)
@@ -212,7 +196,6 @@ class RolloutStorage(object):
                 'actions_discrete': _flatten_helper(T, N, actions_discrete),
                 'actions_box': _flatten_helper(T, N, actions_box),
                 'value_preds': _flatten_helper(T, N, value_preds),
-                'terminations': _flatten_helper(T, N, terminations),
                 'returns': _flatten_helper(T, N, returns),
                 'masks': _flatten_helper(T, N, masks),
                 'old_action_log_probs': _flatten_helper(T, N, old_action_log_probs),
@@ -233,11 +216,11 @@ class GlobalRolloutStorage(RolloutStorage):
         self.has_extras = True
         self.extras_size = extras_size
 
-    def insert(self, obs, rgb, rec_states, actions, action_log_probs, value_preds, option, terminations,
+    def insert(self, obs, rgb, rec_states, actions, action_log_probs, value_preds, option,
                rewards, masks, extras):
         self.extras[self.step + 1].copy_(extras)
         super(GlobalRolloutStorage, self).insert(obs, rgb, rec_states, actions,
-                                                 action_log_probs, value_preds, option, terminations, rewards, masks)
+                                                 action_log_probs, value_preds, option, rewards, masks)
 
 
 Datapoint = namedtuple('Datapoint',

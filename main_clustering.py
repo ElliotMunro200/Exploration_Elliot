@@ -3,6 +3,7 @@ from pytictoc import TicToc
 from collections import deque
 
 import os
+import sys
 
 os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
@@ -57,7 +58,7 @@ def get_frontier_map(map_gt, explored_gt, visited_gt, bad_frontier_map):
     contour = binary_dilation(explored_gt==0, selem) & (explored_gt==1) # frontier points (dilated by selem)
     contour = contour & (binary_dilation(map_gt, selem)==0) # same as above, but removing points near obstacles with selem
     contour = contour & (binary_dilation(visited_gt, morphology.disk(1))==0) # removing points previously visited with disc(rad=1)
-    contour = contour & (binary_dilation(bad_frontier_map, morphology.disk(1))==0) # removing points in the bad frontier map
+    contour = contour & (binary_dilation(bad_frontier_map, morphology.disk(1))==0) # removing points in the bad frontier map (the current goal point).
     contour = morphology.remove_small_objects(contour, 2) # removing clusters (square connectivity) of size less than 2
     
     '''
@@ -144,7 +145,7 @@ def main():
         explored_area_log = np.zeros((num_scenes, num_episodes, traj_lengths))
         explored_ratio_log = np.zeros((num_scenes, num_episodes, traj_lengths))
 
-    g_episode_rewards = deque(maxlen=1000)
+    g_episode_rewards = deque(maxlen=100000)
     g_value_losses = deque(maxlen=1000)
     g_termination_losses = deque(maxlen=1000)
     g_action_losses = deque(maxlen=1000)
@@ -178,7 +179,7 @@ def main():
     torch.set_grad_enabled(False)
 
     # Calculating full and local map sizes
-    map_size = args.map_size_cm // args.map_resolution
+    map_size = args.map_size_cm // args.map_resolution #2560 / 5 = 512
     full_w, full_h = map_size, map_size
     local_w, local_h = int(full_w / args.global_downscaling), \
                        int(full_h / args.global_downscaling)
@@ -186,7 +187,7 @@ def main():
     # Initializing full and local map
     full_map = torch.zeros(num_scenes, num_maps, full_w, full_h).float().to(device)
     local_map = torch.zeros(num_scenes, num_maps, local_w, local_h).float().to(device)
-    bad_frontier_map = np.zeros((num_scenes, 1, local_w, local_h))
+    bad_frontier_map = np.zeros((num_scenes, 1, local_w, local_h)) # the current goal frontier point
 
     # Initial full and local pose
     full_pose = torch.zeros(num_scenes, 3).float().to(device)
@@ -207,13 +208,13 @@ def main():
         full_map.fill_(0.)
         bad_frontier_map.fill(0.)
         full_pose.fill_(0.)
-        full_pose[:, :2] = args.map_size_cm / 100.0 / 2.0
+        full_pose[:, :2] = args.map_size_cm / 100.0 / 2.0 # map_size half-breadth = 12.8m (x,y)
 
         locs = full_pose.cpu().numpy()
-        planner_pose_inputs[:, :3] = locs
+        planner_pose_inputs[:, :3] = locs # = [12.8, 12.8, 0.0] (x,y,z)
         for e in range(num_scenes):
-            r, c = locs[e, 1], locs[e, 0]
-            loc_r, loc_c = [int(r * 100.0 / args.map_resolution),
+            r, c = locs[e, 1], locs[e, 0] # row of location in map in m, column of location in map in m.
+            loc_r, loc_c = [int(r * 100.0 / args.map_resolution), # map co-ordinates (blocks in map)
                             int(c * 100.0 / args.map_resolution)]
 
             full_map[e, 2:4, loc_r - 1:loc_r + 2, loc_c - 1:loc_c + 2] = 1.0
@@ -225,13 +226,13 @@ def main():
                                               (full_w, full_h))
 
             planner_pose_inputs[e, 3:] = lmb[e]
-            origins[e] = [lmb[e][2] * args.map_resolution / 100.0,
+            origins[e] = [lmb[e][2] * args.map_resolution / 100.0, # [0.0, 0.0, 0.0]
                           lmb[e][0] * args.map_resolution / 100.0, 0.]
 
         for e in range(num_scenes):
             local_map[e] = full_map[e, :, lmb[e, 0]:lmb[e, 1], lmb[e, 2]:lmb[e, 3]]
             local_pose[e] = full_pose[e] - \
-                            torch.from_numpy(origins[e]).to(device).float()
+                            torch.from_numpy(origins[e]).to(device).float() # local_pose = full_pose since origins = 0.
 
     init_map_and_pose()
 
@@ -287,7 +288,7 @@ def main():
         state_dict = torch.load(args.load_global,
                                 map_location=lambda storage, loc: storage)
         g_policy.load_state_dict(state_dict)
-        torch.save(g_policy.state_dict(), os.path.join(log_dir, "model_best_gibson_version.global"), _use_new_zipfile_serialization=False)
+        torch.save(g_policy.state_dict(), os.path.join(log_dir, "model_best_gibson_version.global"), _use_new_zipfile_serialization=False) #should make naming general to MP3D.
 
     if not args.train_global:
         g_policy.eval()
@@ -387,7 +388,7 @@ def main():
         for step in range(args.max_episode_length):
             total_num_steps += 1
 
-            g_step = (step // args.num_local_steps) % args.num_global_steps # (0-999 // 50/25) % 20/40: 0-19/39
+            g_step = (step // args.num_local_steps) % args.num_global_steps # (0-999 // 50/25) % 20/40: 0-19/39, MP3D/Gibson. 
             eval_g_step = step + 1
 
             # ------------------------------------------------------------------
@@ -426,28 +427,29 @@ def main():
                     local_step_count[e] -= 1
 
                 else: #navigation
-                    if local_step_count[e] == 0: #reset goal point after exploration
-                        cpu_actions = nn.Sigmoid()(g_action[e,1:]).cpu().numpy()
-                        global_goals[e] = [int(cpu_actions[0] * (local_w-1)), int(cpu_actions[1] * (local_h-1))]
+                    if local_step_count[e] == 0: #reset step count for macro.
+                        cpu_actions = nn.Sigmoid()(g_action[e,1:]).cpu().numpy() # taking actions from gpu and putting on cpu after Sigmoid.
+                        global_goals[e] = [int(cpu_actions[0] * (local_w-1)), int(cpu_actions[1] * (local_h-1))] # [int(x * 511), int(y * 511)], i.e. action-goals as map co-ordinates.
                         #print("new goal points:")
                         #print(e)
                         #print(global_goals[e])
-                        change_goal = True
-
-                        frontier_map = local_map[e, -1, :, :].detach().cpu().numpy()
-                        ind_r,ind_c = np.nonzero(frontier_map)
-                        if ind_r.size == 0 or ind_c.size == 0:
-                            ind_r,ind_c = np.array([int(planner_pose_inputs[e,1] * 100.0 / args.map_resolution)]),\
-                                          np.array([int(planner_pose_inputs[e,0] * 100.0 / args.map_resolution)])
-                        ind = np.stack((ind_r,ind_c),1)
-                        dist = ind - np.array(global_goals[e])
+                        change_goal = True # True, if navigation. False, if look-around.
+                        if num_maps == 5:
+                            frontier_map = local_map[e, 4, :, :].detach().cpu().numpy() # frontier map taken to cpu for computations.
+                        else:
+                            frontier_map = local_map[e, 5, :, :].detach().cpu().numpy()
+                        ind_r,ind_c = np.nonzero(frontier_map) # finding indicies of non-zeros on the frontier map. 
+                        if ind_r.size == 0 or ind_c.size == 0: # if there are no frontiers in the frontier map:
+                            ind_r,ind_c = np.array([int(planner_pose_inputs[e,1] * 100.0 / args.map_resolution)]), np.array([int(planner_pose_inputs[e,0] * 100.0 / args.map_resolution)]) # the current timestep pose of the agent, updated each step from sensor info. 
+                        ind = np.stack((ind_r,ind_c),1) # ([87,256],[x2,y2],[x3,y3],...,etc.)
+                        dist = ind - np.array(global_goals[e]) # calculating the distances of the frontier points from the arbitrary goal from the policy.
                         dist = dist**2
-                        dist = np.sum(dist,1)
-                        f_ind = np.argmin(dist)
-                        frontier_goals[e] = [ind_r[f_ind],ind_c[f_ind]]
+                        dist = np.sum(dist,1) 
+                        f_ind = np.argmin(dist) # returning the action-goal indicies (x,y) that minimize the distance to the arbitrary goal.
+                        frontier_goals[e] = [ind_r[f_ind],ind_c[f_ind]] # setting these as the new frontier goals for each scene.
                         print("new frontier points for " + str(e))
                         print((ind_r[f_ind],ind_c[f_ind]))
-                        bad_frontier_map[e,0,ind_r[f_ind],ind_c[f_ind]] = 1
+                        bad_frontier_map[e,0,ind_r[f_ind],ind_c[f_ind]] = 1 # only the chosen frontier point goal is set as 1 in the bad frontier map.
                         local_step_count[e] = args.num_local_steps
                     
                     local_step_count[e] -= 1
@@ -462,16 +464,16 @@ def main():
                     for en, p_input in enumerate(planner_inputs):
                         p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy() # occupancy map
                         p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy() # explored map
-                        p_input['pose_pred'] = planner_pose_inputs[en]
-                        p_input['goal'] = global_goals[e] # frontier_goals[e]
-                        p_input['goal_arbitrary'] = global_goals[e]
+                        p_input['pose_pred'] = planner_pose_inputs[en] # e.g. (2.4m 8.3m, 0.0m, 0, 512, 0, 512)
+                        p_input['goal'] = frontier_goals[e] # global_goals[e] # used for computing movement atoms by path planning.
+                        p_input['goal_arbitrary'] = global_goals[e] # only used for visualizations. how exactly?
                         p_input['change_goal'] = change_goal
                         p_input['active'] = True if en==e else False
 
                     output = envs.get_short_term_goal(planner_inputs)
 
-                    action_target = output[e, -1].long().to(device)
-                    action[e] = action_target.cpu()
+                    action_target = output[e, -1].long().to(device) # putting the env short-term goal (action_target) on the gpu. action_target = (0:right, 1:left, 2:forward).
+                    action[e] = action_target.cpu() # putting action_targets also on cpu.
                     #if output[e,0] == True:
                     #    local_step_count_nav[e] = 0
 
@@ -483,8 +485,8 @@ def main():
             #print("step:")
             #print(current_option)
             action = torch.from_numpy(action)
-            #print(action)
-         
+            print(action)
+            sys.exit("Error message")
             obs, rew, done, infos = envs.step(action)
 
             g_masks = torch.FloatTensor([0 if x else 1
@@ -502,7 +504,7 @@ def main():
                 init_map_and_pose()
             # ------------------------------------------------------------------
 
-            # Update the occupancy and exploration maps
+            # Update maps 0-3 (not frontier). They come directly from the habitat envs, through infos with line just above: "obs, rew, done, infos = envs.step(action)". 
             for env_idx in range(num_scenes):
                 env_obs = obs[env_idx].to("cpu")
                 env_poses = torch.from_numpy(np.asarray(
@@ -545,7 +547,7 @@ def main():
                 g_value_all2[e].append(g_value[e,1].cpu().numpy().copy())
 
 
-            print("Timer for phase 5")
+            ("Timer for phase 5")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
@@ -572,8 +574,14 @@ def main():
                     local_map[e, 4] = get_frontier_map(local_map[e, 0, :, :].detach(), \
                         local_map[e, 1, :, :].detach(), local_map[e, 3, :, :].detach(), bad_frontier_map[e,0,:,:])
                     if num_maps >= 6:
-                        local_map[e, 5] = frontier_clustering(local_map[e, 4, :, :].detach(), \
-                            step, algo="AGNES", metric=None, save_freq=None)
+                        frontier_map = local_map[e, 4, :, :].detach().cpu().numpy()
+                        num_frontier_points = len(np.nonzero(frontier_map)[0])
+                        if num_frontier_points < 5:
+                            print(f"ONLY {num_frontier_points} FRONTIER POINTS, SO NOT ENOUGH FOR CLUSTERING")
+                            frontier_clusters = np.zeros(np.shape(frontier_map))
+                        else:
+                            frontier_clusters = frontier_clustering(frontier_map, step=0, algo="AGNES", metric=None, save_freq=None)
+                        local_map[e, 5] = torch.from_numpy(frontier_clusters.astype(float)).float().to(device)
                 global_input = local_map
                 #global_input[:, 4:, :, :] = \
                 #    nn.MaxPool2d(args.global_downscaling)(full_map)
@@ -688,8 +696,8 @@ def main():
                 torch.set_grad_enabled(True)
 
                 
-                # Train Global Policy
-                if g_step % args.num_global_steps == args.num_global_steps - 1: # true from step 975/950 (local=25/50) = the start of the last macro-action
+                # Train Global Policy (only trains g_policy once per episode - through "g_agent.update(g_rollouts)").
+                if g_step % args.num_global_steps == args.num_global_steps - 1: # "if on final episode macro: ...".
                     print("#######Training Global Policy#######")
                     
                     g_next_value, g_terminations = g_policy.get_value(
@@ -717,7 +725,7 @@ def main():
 
             # ------------------------------------------------------------------
             # Logging
-            if total_num_steps % args.log_interval == 0:
+            if total_num_steps % args.log_interval == 0: # log interval = 10
                 end = time.time()
                 time_elapsed = time.gmtime(end - start)
                 log = " ".join([
@@ -764,20 +772,18 @@ def main():
 
             # ------------------------------------------------------------------
             # Save best models
-            if (total_num_steps * num_scenes) % args.save_interval < \
-                    num_scenes:
+            if (total_num_steps * num_scenes) % args.save_interval < num_scenes: #total steps across all scenes % 10 < 4 (0,1,2,3,10,11,12,13). done for approximation to the s_interval.
 
-                # Save Global Policy Model
-                if len(g_episode_rewards) >= 100 and \
-                        (np.mean(g_episode_rewards) >= best_g_reward) \
-                        and not args.eval:
+                # Save Global Policy Model (if not eval, and [model is at the best performance of the minimum 100 episodes trained this run or is the last step of the last episode])
+                if (not args.eval) and \
+                    ((len(g_episode_rewards) >= 100 and (np.mean(g_episode_rewards) >= best_g_reward)) \
+                    or ((ep_num == num_episodes - 1) and (step % (args.max_episode_length-1) == 0))):
                     torch.save(g_policy.state_dict(),
-                               os.path.join(log_dir, "model_best.global"))
+                               os.path.join(log_dir, "model_best.global")) #is: "./tmp//models/exp#/model_best.global"
                     best_g_reward = np.mean(g_episode_rewards)
 
             # Save periodic models
-            if (total_num_steps * num_scenes) % args.save_periodic < \
-                    num_scenes:
+            if (total_num_steps * num_scenes) % args.save_periodic < num_scenes: # periodic=30000
                 step = total_num_steps * num_scenes
 
                 if args.train_global:
@@ -785,6 +791,24 @@ def main():
                                os.path.join(dump_dir,
                                             "periodic_{}.global".format(step)))
             # ------------------------------------------------------------------
+    def plot(data):
+        len_data = len(data)
+        max_rew = max(data)
+        t = range(len_data)
+        plt.plot(t, data, 'b', label=f"episodic reward")
+        plt.legend()
+        plt.axis([0,len_data,0,max_rew])
+        plt.xlabel('Episode')
+        plt.ylabel('Total Reward')
+        plt.title('Episodic Reward')
+        plt.axhline(y=1.0, color='k', ls = '--')
+        for i in range(0,len_data,50):
+            plt.axvline(x=i, color='r', ls = '--')
+        fn = f"{log_dir}EpRews_{args.split}.png"
+        plt.savefig(fn)
+        print(f"SAVED EPISODIC REWARDS TO: {fn}")
+    
+    plot(g_episode_rewards)    
 
     # Print and save model performance numbers during evaluation
     if args.eval:

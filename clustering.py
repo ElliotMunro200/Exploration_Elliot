@@ -30,23 +30,19 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
         clusters = DBSCAN(eps=metric)
     elif algo == "AGNES":
         clusters = AgglomerativeClustering(n_clusters=n_clusters, affinity='euclidean', linkage=linkage)
-
-    print(f"frontier map channel is of type: {type(data)}, and of data-form: {data_form}")  # torch.Tensor or np.ndarray
-    print(f"DATA_IN_SHAPE: {data.shape}")
+    
     if data_form == "map":
         num_rows, num_cols = np.shape(data)[0], np.shape(data)[1]
-        data = map_to_columns(data, num_rows)
+        data = map_to_columns(data, num_rows)    
     elif data_form == "columns":
         num_rows = num_cols = np.amax(data)
-    print(f"DATA_MID_SHAPE: {data.shape}")
-    y_hc = clusters.fit_predict(data)  # model fitting on the dataset
-
+    y_hc = clusters.fit_predict(data) # model fitting on the dataset
+    #print(f"CLUSTERING N_CLUSTERS: {n_clusters}")
+        
     # calculating cluster means
     means_col = get_frontier_cluster_region_means(data, y_hc, n_clusters)
-    print(means_col)
+    #print(means_col)
     means_map = columns_to_map(means_col, num_rows, num_cols)
-	
-    print(f"DATA_OUT_SHAPE: {means_map.shape}")
     
     # plotting
     if save_freq and (step % save_freq == 0):
@@ -63,11 +59,12 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
 
 
 def map_to_columns(data, num_rows):
-    columns = []
-    for i, row in enumerate(data):
-        for j, val in enumerate(row):
-            columns.append([j, num_rows-1-i])
-    columns = np.array(columns)
+    nzero_is = np.nonzero(data)
+    nzero_is_sw = np.transpose(nzero_is)
+    columns = np.flip(nzero_is_sw, axis=1)
+    slice = columns[:,1]
+    convert_slice = [(-1*x)-1+num_rows for x in slice]
+    columns[:,1] = convert_slice
     return columns
 
 def columns_to_map(data, r, c):
@@ -125,3 +122,4 @@ if __name__ == "__main__":
     step = 0
 
     frontier_clustering(data, step, data_form="columns", algo="AGNES", metric=None, save_freq=1)
+
