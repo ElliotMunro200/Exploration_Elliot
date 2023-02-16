@@ -122,7 +122,7 @@ def fill_color(colored, mat, color):
 
 
 def get_colored_map(mat, collision_map, visited, goal, goal_arbitrary,
-                    explored, gt_map, frontier, change_goal_flag):
+                    explored, gt_map, frontier, frontier_clusters, width, change_goal_flag):
     m, n = mat.shape
     colored = np.zeros((m, n, 3))
     pal = sns.color_palette("Paired")
@@ -134,6 +134,12 @@ def get_colored_map(mat, collision_map, visited, goal, goal_arbitrary,
     #explored map
     current_palette = [(235. / 255., 243. / 255., 1.)]
     colored = fill_color(colored, explored, current_palette[0])
+
+    if width:
+        local_explore = np.zeros((m, n, 1))
+        local_explore[256-width:256+width+1,256-width:256+width+1] = 1
+        local_explore[256-width+1:256+width,256-width+1:256+width] = 0 
+        colored = fill_color(colored, local_explore, current_palette[7])
 
     #occupancy map
     colored = fill_color(colored, mat, pal[3])
@@ -169,18 +175,23 @@ def get_colored_map(mat, collision_map, visited, goal, goal_arbitrary,
     goal_mat2 = 1 - skimage.morphology.binary_dilation(
         goal_mat2, selem) != True
 
+    #frontier clusters
+    front_mat = 1 - skimage.morphology.binary_dilation(
+        frontier_clusters, selem) != True
+    colored = fill_color(colored, front_mat, pal[9])
+
     #goal map
     global flag
 
     if change_goal_flag:
        flag = not flag
 
-    if flag:
-        colored = fill_color(colored, goal_mat, current_palette[0])
-    else:
-        colored = fill_color(colored, goal_mat, current_palette[1])
+    if flag: # if change_goal_flag is False (should always be the case), then flag=True, and this line is executed (explored colour).
+        colored = fill_color(colored, goal_mat, current_palette[0]) #blue
+    else: # this should never happen.
+        colored = fill_color(colored, goal_mat, current_palette[1]) #orange
 
-    colored = fill_color(colored, goal_mat2, current_palette[2])
+    colored = fill_color(colored, goal_mat2, current_palette[2]) #green
 
     colored = 1 - colored
     colored *= 255

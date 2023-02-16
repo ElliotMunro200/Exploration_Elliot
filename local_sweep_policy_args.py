@@ -18,8 +18,8 @@ def get_args():
                                 and training on gpus """)
     parser.add_argument('--num_processes_per_gpu', type=int, default=14)
     parser.add_argument('--num_processes_on_first_gpu', type=int, default=0)
-    parser.add_argument('--num_episodes', type=int, default=1000000,
-                        help='number of training episodes (default: 1000000)')
+    parser.add_argument('--num_episodes', type=int, default=100,
+                        help='number of training episodes (default: 100)')
     parser.add_argument('--no_cuda', action='store_true', default=False,
                         help='disables CUDA training')
     parser.add_argument('--eval', type=int, default=0,
@@ -39,7 +39,7 @@ def get_args():
     parser.add_argument('--train_slam', type=int, default=1,
                         help="""0: Do not train the Neural SLAM Module
                                 1: Train the Neural SLAM Module (default: 1)""")
-    parser.add_argument('--local_explore_width', type=int, default=None)
+    parser.add_argument('--local_explore_width', type=int, default=15)
 
     # Logging, loading models, visualization
     parser.add_argument('--log_interval', type=int, default=10,
@@ -51,7 +51,7 @@ def get_args():
                         help='path to dump models and log (default: ./tmp/)')
     parser.add_argument('-exp_output', '--exp_output', type=str, default="exp_data/",
                         help='path to dump experiments data')
-    parser.add_argument('--exp_name', type=str, default="exp1",
+    parser.add_argument('--exp_name', type=str, default="exp_local",
                         help='experiment name (default: exp1)')
     parser.add_argument('--save_periodic', type=int, default=30000,
                         help='Model save frequency in number of updates')
@@ -81,7 +81,7 @@ def get_args():
                         help='Frame width (default:84)')
     parser.add_argument('-fh', '--frame_height', type=int, default=128,
                         help='Frame height (default:84)')
-    parser.add_argument('-el', '--max_episode_length', type=int, default=1000,
+    parser.add_argument('-el', '--max_episode_length', type=int, default=25,
                         help="""Maximum episode length in seconds for
                                 Doom (default: 180)""")
     parser.add_argument("--sim_gpu_id", type=int, default=1,
@@ -104,7 +104,7 @@ def get_args():
     parser.add_argument('--global_lr', type=float, default=2.5e-5, #2.5e-5
                         help='global learning rate (default: 2.5e-5)')
     parser.add_argument('--global_hidden_size', type=int, default=256,
-                        help='local_hidden_size')
+                        help='global_hidden_size')
     parser.add_argument('--eps', type=float, default=1e-5,
                         help='RL Optimizer epsilon (default: 1e-5)')
     parser.add_argument('--alpha', type=float, default=0.99,
@@ -123,7 +123,7 @@ def get_args():
                         help='value loss coefficient (default: 0.5)')
     parser.add_argument('--max_grad_norm', type=float, default=0.5,
                         help='max norm of gradients (default: 0.5)')
-    parser.add_argument('--num_global_steps', type=int, default=40,#20
+    parser.add_argument('--num_global_steps', type=int, default=25,
                         help='number of forward steps in A2C (default: 5)')
     parser.add_argument('--ppo_epoch', type=int, default=4,
                         help='number of ppo epochs (default: 4)')
@@ -137,7 +137,7 @@ def get_args():
     # Visual Encoder
     parser.add_argument('--visual_optimizer', type=str,
                         default='adam,lr=0.0001')
-    parser.add_argument('--num_local_steps', type=int, default=25, #50
+    parser.add_argument('--num_local_steps', type=int, default=1,
                         help="""Number of steps the local can
                             perform between each global instruction""")
     parser.add_argument('--local_hidden_size', type=int, default=512,

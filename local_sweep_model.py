@@ -160,15 +160,9 @@ class RL_Policy(nn.Module):
         else:
             raise NotImplementedError
 
-        num_outputs = action_space_discrete.n
-        #self.dist_discrete = Categorical(self.network.output_size, num_outputs)
-        self.dist_discrete = DiagGaussian(self.network.output_size, 1) #(256,1) size Linear
+        self.dist_discrete = Categorical(self.network.output_size, 3)
 
-        num_outputs = action_space_box.shape[0] 
-        self.dist_box = DiagGaussian(self.network.output_size, num_outputs) #(256,2) size Linear
-
-        self.critic_linear = nn.Linear(256, 2) #value
-        self.terminations = nn.Linear(256, 2)  #termination probabilty
+        self.critic_linear = nn.Linear(256, 1) #value
         self.model_type = model_type
         self.num_steps = 0
         self.device = device
@@ -190,80 +184,49 @@ class RL_Policy(nn.Module):
             visual_feature = self.visual_encoder(rgb, masks)
             return self.network(inputs, rnn_hxs, visual_feature, masks, extras)
 
-    def act(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
+    def act(self, inputs, num_scenes, rnn_hxs, rgb, masks, extras=None, deterministic=False):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
+        value = self.critic_linear(actor_features)#.squeeze(-1)
         
-        action_log_probs = torch.zeros(len(option)).to(self.device)
-        action = torch.zeros(len(option),3).to(self.device)
+        action_log_probs = torch.zeros(num_scenes).to(self.device)
+        action = torch.zeros(num_scenes,1).to(self.device)
 
-        for e in range(len(option)):
+        for e in range(num_scenes):
 
-            if option[e] == 1: #rotate, explore: f l r ? 
-                dist = self.dist_discrete(actor_features[e]) #FixedNormal distribution
-                if deterministic: 
-                    action[e,0] = dist.mode()
-                else: #default is deterministic=False.
-                    action[e,0] = dist.sample() #sampling from Normal dist Linear(actor_features[e]) --> mean[e] . N(mean[e],sigma).sample().
-                action_log_probs[e] = dist.log_probs(action[e,0])
-            else: # navigation goal point
-                dist = self.dist_box(actor_features[e].unsqueeze(0))
-                if deterministic: 
-                    action[e,1:] = dist.mode()
-                else: #default is deterministic=False.
-                    action[e,1:] = dist.sample() # same as above, but 2 means and 2 sigmas for each [e]. The 2 N(m,s) for each [e] are separately determined by the Linear(a_feat[e]).
-                action_log_probs[e] = dist.log_probs(action[e,1:])
+            dist = self.dist_discrete(actor_features[e]) #Categorical distribution
+            if deterministic: 
+                action[e,0] = dist.mode()
+            else: #default is deterministic=False.
+                action[e,0] = dist.sample()
+            action_log_probs[e] = dist.log_probs(action[e,0])
 
-        return  action, action_log_probs, rnn_hxs
-
-
-    def predict_option_termination(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
-        actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
-        value = self.critic_linear(actor_features).squeeze(-1)
-
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
-
-        #value = torch.index_select(value, 1, torch.LongTensor([1,0]).to('cuda:0'))
-        #terminations = torch.index_select(terminations, 1, torch.LongTensor([1,0]).to('cuda:0'))
-            
-        next_option = value.argmax(dim=-1)
-
-        return value, terminations, next_option.tolist(), rnn_hxs
+        return  action, value, action_log_probs, rnn_hxs
 
     def get_value(self, inputs, rnn_hxs, rgb, masks, extras=None):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
-        value = self.critic_linear(actor_features).squeeze(-1)
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
+        value = self.critic_linear(actor_features)#.squeeze(-1)
 
-        #value = torch.index_select(value, 1, torch.LongTensor([1,0]).to('cuda:0'))
-        #terminations = torch.index_select(terminations, 1, torch.LongTensor([1,0]).to('cuda:0'))
+        return value
 
-        return value, terminations
-
-    def evaluate_actions(self, inputs, option, rnn_hxs, rgb, masks, action_discrete, action_box, extras=None):
+    def evaluate_actions(self, inputs, num_scenes, rnn_hxs, rgb, masks, action_discrete, action_box, extras=None):
 
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
-        value = self.critic_linear(actor_features).squeeze(-1)
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
-
-        #value = torch.index_select(value, 1, torch.LongTensor([1,0]).to('cuda:0'))
-        #terminations = torch.index_select(terminations, 1, torch.LongTensor([1,0]).to('cuda:0'))
-
-        action_log_probs = torch.zeros(len(option)).to(self.device)
+        value = self.critic_linear(actor_features)#.squeeze(-1)
+        
+        action_log_probs = torch.zeros(num_scenes).to(self.device)
         dist_entropy = 0
-        for e in range(len(option)):
+        for e in range(num_scenes):
 
-            if option[e] == 1: #explore: f l r
-                dist = self.dist_discrete(actor_features[e])
-                #action_log_probs[e] = dist.log_probs(action[e,0])
-                action_log_probs[e] = dist.log_probs(action_discrete[e])
-            else: # navigation goal point
-                dist = self.dist_box(actor_features[e].unsqueeze(0))
-                #action_log_probs[e] = dist.log_probs(action[e,1:])
-                action_log_probs[e] = dist.log_probs(action_box[e])
+            dist = self.dist_discrete(actor_features[e]) #Categorical distribution
+            if deterministic: 
+                action[e,0] = dist.mode()
+            else: #default is deterministic=False.
+                action[e,0] = dist.sample()
+            action_log_probs[e] = dist.log_probs(action[e,0])
 
             dist_entropy += dist.entropy().mean()
 
-        return value, terminations, action_log_probs, dist_entropy, rnn_hxs
+        return value, action_log_probs, dist_entropy, rnn_hxs
 
     def epsilon(self):
         eps = 0.1 + (1.0 - 0.1) * exp(-self.num_steps / 20000)

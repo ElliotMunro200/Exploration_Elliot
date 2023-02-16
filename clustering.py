@@ -30,26 +30,26 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
         clusters = DBSCAN(eps=metric)
     elif algo == "AGNES":
         clusters = AgglomerativeClustering(n_clusters=n_clusters, affinity='euclidean', linkage=linkage)
-
-    print(f"frontier map channel is of type: {type(data)}, and of data-form: {data_form}")  # torch.Tensor or np.ndarray
-    print(f"DATA_IN_SHAPE: {data.shape}")
+    
     if data_form == "map":
         num_rows, num_cols = np.shape(data)[0], np.shape(data)[1]
-        data = map_to_columns(data, num_rows)
+        data = map_to_columns(data, num_rows)    
     elif data_form == "columns":
         num_rows = num_cols = np.amax(data)
-    print(f"DATA_MID_SHAPE: {data.shape}")
+
+    #print(f"DATA_MID_SHAPE: {data.shape}")
     y_hc = clusters.fit_predict(data)  # model fitting on the dataset
-    print(f"DATA_CLUSTERING_SHAPE: {y_hc}")
+    #print(f"DATA_CLUSTERING_SHAPE: {y_hc}")
     if y_hc.shape[0] == 0:
         save_freq = 1
+
     # calculating cluster means
     means_col = get_frontier_cluster_region_means(data, y_hc, n_clusters)
-    print(means_col)
+    #print(means_col)
     means_map = columns_to_map(means_col, num_rows, num_cols)
 	
-    print(f"DATA_OUT_SHAPE: {means_map.shape}")
-    print(f"MEANS_MAP: {np.amax(means_map)}")
+    #print(f"DATA_OUT_SHAPE: {means_map.shape}")
+    #print(f"MEANS_MAP: {np.amax(means_map)}")
     
     # plotting
     if save_freq and (step % save_freq == 0):
@@ -129,3 +129,4 @@ if __name__ == "__main__":
     step = 0
 
     frontier_clustering(data, step, data_form="columns", algo="AGNES", metric=None, save_freq=1)
+

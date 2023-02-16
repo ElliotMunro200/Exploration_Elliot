@@ -120,7 +120,6 @@ class Exploration_Env(habitat.RLEnv):
         self.scene_name = None
         self.maps_dict = {}
         self.dump_dir = f"{args.dump_location}/dump/{args.exp_name}/" #"./tmp/dump/exp#/"
-        self.local_explore_width = self.args.local_explore_width
         
 
     def randomize_env(self):
@@ -167,7 +166,6 @@ class Exploration_Env(habitat.RLEnv):
             full_map_size = args.map_size_cm//args.map_resolution
             self.explorable_map = self._get_gt_map(full_map_size)
         self.prev_explored_area = 0.
-        self.prev_explored_local_area = 0.
         
 
         # Preprocess observations
@@ -181,7 +179,7 @@ class Exploration_Env(habitat.RLEnv):
         # Initialize map and pose
         self.map_size_cm = args.map_size_cm
         self.mapper.reset_map(self.map_size_cm)
-        self.loc_0 = [int(self.map_size_cm/100.0/2.0), int(self.map_size_cm/100.0/2.0), int(0.)]
+        self.loc_0 = [self.map_size_cm/100.0/2.0, self.map_size_cm/100.0/2.0, 0.]
         self.curr_loc = [self.map_size_cm/100.0/2.0,
                          self.map_size_cm/100.0/2.0, 0.]
         self.curr_loc_gt = self.curr_loc
@@ -332,11 +330,8 @@ class Exploration_Env(habitat.RLEnv):
 
 
         if self.timestep%args.num_local_steps==0:
-            if args.num_local_steps > 1:    
-                area, ratio = self.get_global_reward_old()
-            elif args.num_local_steps == 1:
-                area, ratio = self.get_local_explore_reward()
-            self.info['exp_reward'] = area 
+            area, ratio = self.get_global_reward_old()
+            self.info['exp_reward'] = area #- self.collision_flag*0.01
             self.info['exp_ratio'] = ratio
         else:
             self.info['exp_reward'] = None
@@ -371,11 +366,12 @@ class Exploration_Env(habitat.RLEnv):
         return 0.
 
     def get_local_explore_reward(self):
-        curr_explored_local = self.explored_map[self.loc_0[1]-self.local_explore_width:self.loc_0[1]+self.local_explore_width+1,
-                                                self.loc_0[0]-self.local_explore_width:self.loc_0[0]+self.local_explore_width+1] #(512,512) means 5cm per block. 
+        # need this to be a variable that is a slice of the explored map.
+        width = self.args.local_explore_width # 15.
+        curr_explored_local = self.explored_map[self.loc_0[0]-width:self.loc_0[0]+width+1, self.loc_0[1]-width:self.loc_0[1]+width+1] #(512,512) means 5cm per block. 
         curr_explored_local_area = curr_explored_local.sum() #summing the current explored amount.
 
-        reward_scale = (2*self.local_explore_width+1)**2 #finding the total area of the map
+        reward_scale = (2*width+1)**2 #finding the total area of the map
         m_reward = (curr_explored_local_area - self.prev_explored_local_area)*1. #finding the amount explored on the last step
         m_ratio = m_reward/reward_scale #the explored prop progress on this episode.
         m_reward = m_reward * 25./10000. # converting to m^2.
@@ -471,7 +467,6 @@ class Exploration_Env(habitat.RLEnv):
         params['vision_range'] = self.args.vision_range
         params['visualize'] = self.args.visualize
         params['obs_threshold'] = self.args.obs_threshold #1
-        params['num_maps'] = self.args.num_maps
         self.selem = skimage.morphology.disk(self.args.obstacle_boundary /
                                              self.args.map_resolution)
         mapper = MapBuilder(params)
@@ -620,6 +615,7 @@ class Exploration_Env(habitat.RLEnv):
         output[1] = int(new_goal[0])#discretize(relative_dist)
         output[2] = int(new_goal[1])
         output[3] = gt_action # (0:right, 1:left, 2:forward)
+
         return output
 
 
@@ -673,7 +669,6 @@ class Exploration_Env(habitat.RLEnv):
                             self.explorable_map,
                             self.frontier, 
                             self.frontier_clusters,
-                            self.local_explore_width,
                             self.change_goal_flag)
             vis_grid = np.flipud(vis_grid)
 
