@@ -40,13 +40,16 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
         num_rows = num_cols = np.amax(data)
     print(f"DATA_MID_SHAPE: {data.shape}")
     y_hc = clusters.fit_predict(data)  # model fitting on the dataset
-
+    print(f"DATA_CLUSTERING_SHAPE: {y_hc}")
+    if y_hc.shape[0] == 0:
+        save_freq = 1
     # calculating cluster means
     means_col = get_frontier_cluster_region_means(data, y_hc, n_clusters)
     print(means_col)
     means_map = columns_to_map(means_col, num_rows, num_cols)
 	
     print(f"DATA_OUT_SHAPE: {means_map.shape}")
+    print(f"MEANS_MAP: {np.amax(means_map)}")
     
     # plotting
     if save_freq and (step % save_freq == 0):
@@ -63,11 +66,12 @@ def frontier_clustering(data, step, data_form="map", algo="AGNES", metric=None, 
 
 
 def map_to_columns(data, num_rows):
-    columns = []
-    for i, row in enumerate(data):
-        for j, val in enumerate(row):
-            columns.append([j, num_rows-1-i])
-    columns = np.array(columns)
+    nzero_is = np.nonzero(data)
+    nzero_is_sw = np.transpose(nzero_is)
+    columns = np.flip(nzero_is_sw, axis=1)
+    slice = columns[:,1]
+    convert_slice = [(-1*x)-1+num_rows for x in slice]
+    columns[:,1] = convert_slice
     return columns
 
 def columns_to_map(data, r, c):

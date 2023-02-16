@@ -104,6 +104,7 @@ def visualize(option, fig, ax, img, grid, fmm_dist, num_explored, pos, goal, dum
         fn = '{}/episodes/{}/{}/{}-{}-Vis-{}.png'.format(
             dump_dir, (rank + 1), ep_no, rank, ep_no, t)
         plt.savefig(fn)
+        print(f"SAVED IMAGE TO: {fn}")
 
 
 def insert_circle(mat, x, y, value):
