@@ -12,7 +12,7 @@ def get_args():
     parser.add_argument('--auto_gpu_config', type=int, default=0)
     parser.add_argument('--total_num_scenes', type=str, default="auto")
     parser.add_argument('--num_maps', type=int, default=5) #
-    parser.add_argument('-n', '--num_processes', type=int, default=4,
+    parser.add_argument('-n', '--num_processes', type=int, default=2,
                         help="""how many training processes to use (default:4)
                                 Overridden when auto_gpu_config=1
                                 and training on gpus """)
@@ -129,6 +129,8 @@ def get_args():
                         help='number of ppo epochs (default: 4)')
     parser.add_argument('--num_mini_batch', type=str, default="auto",
                         help='number of batches for ppo (default: 32)')
+    parser.add_argument('-nepb', '--num_envs_per_batch', type=int, default=2,
+                        help='number of processes per batch')
     parser.add_argument('--clip_param', type=float, default=0.2,
                         help='ppo clip parameter (default: 0.2)')
     parser.add_argument('--use_recurrent_global', type=int, default=1,
@@ -253,7 +255,7 @@ def get_args():
         args.train_local = 0
 
     if args.num_mini_batch == "auto":
-        args.num_mini_batch = args.num_processes // 2
+        args.num_mini_batch = args.num_processes // args.num_envs_per_batch
     else:
         args.num_mini_batch = int(args.num_mini_batch)
 

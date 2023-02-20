@@ -218,11 +218,7 @@ class RL_Policy(nn.Module):
         for e in range(num_scenes):
 
             dist = self.dist_discrete(actor_features[e]) #Categorical distribution
-            if deterministic: 
-                action[e,0] = dist.mode()
-            else: #default is deterministic=False.
-                action[e,0] = dist.sample()
-            action_log_probs[e] = dist.log_probs(action[e,0])
+            action_log_probs[e] = dist.log_probs(action_discrete[e])
 
             dist_entropy += dist.entropy().mean()
 

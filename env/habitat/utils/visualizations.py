@@ -136,10 +136,10 @@ def get_colored_map(mat, collision_map, visited, goal, goal_arbitrary,
     colored = fill_color(colored, explored, current_palette[0])
 
     if width:
-        local_explore = np.zeros((m, n, 1))
+        local_explore = np.zeros((m, n))
         local_explore[256-width:256+width+1,256-width:256+width+1] = 1
-        local_explore[256-width+1:256+width,256-width+1:256+width] = 0 
-        colored = fill_color(colored, local_explore, current_palette[7])
+        local_explore[256-width+1:256+width,256-width+1:256+width] = 0
+        colored = fill_color(colored, local_explore, pal[7])
 
     #occupancy map
     colored = fill_color(colored, mat, pal[3])

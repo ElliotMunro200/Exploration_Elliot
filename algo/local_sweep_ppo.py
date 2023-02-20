@@ -44,7 +44,7 @@ class PPO():
         advantages = (advantages - advantages.mean()) / (
                 advantages.std() + 1e-5)
 
-        num_scenes = rollouts.returns.size[-1]
+        num_scenes = rollouts.returns.size()[-1]
         value_loss_epoch = 0
         action_loss_epoch = 0
         dist_entropy_epoch = 0

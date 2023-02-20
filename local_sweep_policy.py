@@ -151,7 +151,10 @@ def main():
     #plots
     plt.ion() #interactive (mode) on, figures automatically shown.
     fig, ax = plt.subplots(3, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke") # plotting terminations, values, options and their losses.
-    plt.pause(0.001) # for crude animation. figure is updated before pause, GUI event loop runs during pause. 
+    if len(np.shape(ax))==1:
+        ax = np.expand_dims(ax, axis=1)
+
+    plt.pause(0.001) # for crude animation. figure is updated before pause, GUI event loop runs during pause.
 
     if args.eval:
         traj_lengths = args.max_episode_length // args.num_local_steps #1000//25=40
@@ -463,6 +466,8 @@ def main():
 
             #Plot curves
             for e in range(num_scenes):
+                #if num_scenes == 1:
+                #    e = None
 
                 ax[0,e].clear()
                 ax[1,e].clear()
@@ -471,9 +476,9 @@ def main():
                 ax[0,e].plot(g_value_all[e])
                 ax[2,e].plot(g_reward_all[:,e])
 
-            ax[1,0].plot(g_value_losses)
-            ax[1,1].plot(g_action_losses)
-            ax[1,2].plot(g_dist_entropies)
+            #ax[1,0].plot(g_value_losses)
+            #ax[1,1].plot(g_action_losses)
+            #ax[1,2].plot(g_dist_entropies)
 
             plt.gcf().canvas.flush_events()
             fig.canvas.start_event_loop(0.001)
@@ -486,7 +491,7 @@ def main():
             g_process_rewards *= g_masks.cpu().numpy() #when the episode is done, the masks will be 0, the process rewards will go to 0, and the total rewards go to the full amount.
             per_step_g_rewards.append(np.mean(g_reward.cpu().numpy())) #mean reward for the step across all actions.
 
-            #appending the nonzero episode rewards to the g_episode_rewards deque.
+            #appending the nonzero episode rewards to the g_episode_rewards deque (every step).
             if np.sum(g_total_rewards) != 0:
                 for tr in g_total_rewards:
                     g_episode_rewards.append(tr) if tr != 0 else None
@@ -509,17 +514,22 @@ def main():
                     deterministic=False
                 )
 
-            print("g_value")
-            print(g_value)
+            #print("g_value")
+            #print(g_value)
 
             print("Timer for phase 6")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
             if step == args.max_episode_length - 1: #end of (25) step episode.
+                # print rewards
+                ep_rew_by_scene = np.sum(g_reward_all, axis=0)
+                for e, rew in enumerate(ep_rew_by_scene):
+                    print(f"Scene {e}, Reward {rew}")
+
                 ### TRAINING
                 torch.set_grad_enabled(True)
-               
+
                 print("#######Training Global Policy#######")
                     
                 g_next_value = g_policy.get_value(
@@ -618,8 +628,9 @@ def main():
         fn = f"{log_dir}EpRews_local.png"
         plt.savefig(fn)
         print(f"SAVED EPISODIC REWARDS TO: {fn}")
-    
-    plot(g_episode_rewards) 
+
+    if np.sum(g_episode_rewards) != 0:
+        plot(g_episode_rewards)
     
     # If evaluating the model, save the explored_area_log (not updated or useful? since .mat files save every episode the explored prop which is collected every step). 
     if args.eval:
