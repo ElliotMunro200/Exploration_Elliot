@@ -18,7 +18,7 @@ def get_args():
                                 and training on gpus """)
     parser.add_argument('--num_processes_per_gpu', type=int, default=14)
     parser.add_argument('--num_processes_on_first_gpu', type=int, default=0)
-    parser.add_argument('--num_episodes', type=int, default=100,
+    parser.add_argument('--num_episodes', type=int, default=1000,
                         help='number of training episodes (default: 100)')
     parser.add_argument('--no_cuda', action='store_true', default=False,
                         help='disables CUDA training')
@@ -39,7 +39,7 @@ def get_args():
     parser.add_argument('--train_slam', type=int, default=1,
                         help="""0: Do not train the Neural SLAM Module
                                 1: Train the Neural SLAM Module (default: 1)""")
-    parser.add_argument('--local_explore_width', type=int, default=15)
+    parser.add_argument('--local_explore_width', type=int, default=32)
 
     # Logging, loading models, visualization
     parser.add_argument('--log_interval', type=int, default=10,

@@ -658,8 +658,13 @@ class Exploration_Env(habitat.RLEnv):
                             self.dump_dir, self.rank+1, self.episode_no)
             if not os.path.exists(ep_dir):
                 os.makedirs(ep_dir)
-
-            self.num_explored.append(np.sum(self.explored_map * self.explorable_map)/np.sum(self.explorable_map))
+            
+            numerator = self.explored_map * self.explorable_map
+            denominator = self.explorable_map
+            if self.local_explore_width: # if local explore width given, scale to local region.
+                numerator = numerator[256-self.local_explore_width:256+self.local_explore_width+1,256-self.local_explore_width:256+self.local_explore_width+1]
+                denominator = denominator[256-self.local_explore_width:256+self.local_explore_width+1,256-self.local_explore_width:256+self.local_explore_width+1]
+            self.num_explored.append(np.sum(numerator)/np.sum(denominator))
             self.num_forward.append(self.num_forward_step)
 
             #if self.rank != 0:
@@ -689,7 +694,7 @@ class Exploration_Env(habitat.RLEnv):
                         (self.goal[0], self.goal[1]),
                         self.dump_dir, self.rank, self.episode_no,
                         self.timestep, args.visualize,
-                        args.print_images, args.vis_type)
+                        args.print_images, args.vis_type, args.max_episode_length)
            
 
     def _get_gt_map(self, full_map_size):
