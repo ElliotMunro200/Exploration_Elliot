@@ -213,9 +213,9 @@ class RL_Policy(nn.Module):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
         value = self.critic_linear(actor_features)#.squeeze(-1)
         
-        action_log_probs = torch.zeros(num_scenes).to(self.device)
+        action_log_probs = torch.zeros(len(inputs)).to(self.device)
         dist_entropy = 0
-        for e in range(num_scenes):
+        for e in range(len(inputs)):
 
             dist = self.dist_discrete(actor_features[e]) #Categorical distribution
             action_log_probs[e] = dist.log_probs(action_discrete[e])

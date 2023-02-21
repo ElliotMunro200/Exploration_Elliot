@@ -17,7 +17,7 @@ import skimage
 flag = True
 
 def visualize(option, fig, ax, img, grid, fmm_dist, num_explored, pos, goal, dump_dir, rank, ep_no, t,
-              visualize, print_images, vis_style):
+              visualize, print_images, vis_style, max_ep_len):
     for i in range(len(ax)):
         ax[i].clear()
         ax[i].set_yticks([])
@@ -84,7 +84,7 @@ def visualize(option, fig, ax, img, grid, fmm_dist, num_explored, pos, goal, dum
 
 
     ax[3].plot(num_explored)
-    ax[3].set(xlim=(0, 1000), ylim=(0, 1.2),
+    ax[3].set(xlim=(0, max_ep_len), ylim=(0, 1.2),
        xlabel='timesteps', ylabel='explored',
        title='#explored');
     ax[3].set_aspect(1.0/ax[3].get_data_ratio())
