@@ -96,7 +96,7 @@ def bin_points(XYZ_cms, map_size, z_bins, xy_resolution):
     """
     sh = XYZ_cms.shape
     XYZ_cms = XYZ_cms.reshape([-1, sh[-3], sh[-2], sh[-1]])
-    n_z_bins = len(z_bins) + 1
+    n_z_bins = len(z_bins) + 1  # len([25,150]) + 1 = 3
     counts = []
     isvalids = []
     for XYZ_cm in XYZ_cms:

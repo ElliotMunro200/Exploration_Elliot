@@ -127,71 +127,66 @@ def get_colored_map(mat, collision_map, visited, goal, goal_arbitrary,
     colored = np.zeros((m, n, 3))
     pal = sns.color_palette("Paired")
 
-    #explorable map
-    current_palette = [(0.9, 0.9, 0.9)]
-    colored = fill_color(colored, gt_map, current_palette[0]) 
+    # explorable map
+    current_palette = [(0.9, 0.9, 0.9)]  # gray
+    colored = fill_color(colored, gt_map, current_palette[0])
 
-    #explored map
-    current_palette = [(235. / 255., 243. / 255., 1.)]
+    # explored map
+    current_palette = [(235. / 255., 243. / 255., 1.)]  # bluer gray
     colored = fill_color(colored, explored, current_palette[0])
 
     if width:
         local_explore = np.zeros((m, n))
         local_explore[256-width:256+width+1,256-width:256+width+1] = 1
         local_explore[256-width+1:256+width,256-width+1:256+width] = 0
-        colored = fill_color(colored, local_explore, pal[7])
+        colored = fill_color(colored, local_explore, pal[7])  # orange
 
-    #occupancy map
-    colored = fill_color(colored, mat, pal[3])
+    # occupancy map
+    colored = fill_color(colored, mat, pal[3])  # green
 
-    #explored map
-    #current_palette = [(0.6, 0.6, 0.6)]
-    #colored = fill_color(colored, gt_map_explored, current_palette[0])
+    # visited trajectory
+    colored = fill_color(colored, visited, pal[5])  # red
+    # colored = fill_color(colored, visited * visited_gt, pal[5])
 
-    #colored = fill_color(colored, gt_map_explored, pal[3])
+    # frontier
+    colored = fill_color(colored, frontier, pal[6])  # yellow
 
-    #visited trajectory
-    colored = fill_color(colored, visited, pal[5])
-    #colored = fill_color(colored, visited * visited_gt, pal[5])
-
-    #frontier
-    colored = fill_color(colored, frontier, pal[6])
-
-    #collision map
-    colored = fill_color(colored, collision_map, pal[2])
+    # collision map
+    colored = fill_color(colored, collision_map, pal[2])  # light green
 
     current_palette = sns.color_palette()
 
-    #frontier goal point (closest to the arbitrary goal point)
+    # frontier goal point (closest to the arbitrary goal point)
     selem = skimage.morphology.disk(8)
     goal_mat = np.zeros((m, n))
     goal_mat[goal[0], goal[1]] = 1
     goal_mat = 1 - skimage.morphology.binary_dilation(
         goal_mat, selem) != True
 
-    #arbitrary goal point 
+    # arbitrary goal point
     goal_mat2 = np.zeros((m, n))
     goal_mat2[goal_arbitrary[0], goal_arbitrary[1]] = 1
     goal_mat2 = 1 - skimage.morphology.binary_dilation(
         goal_mat2, selem) != True
 
-    #frontier clusters
+    # frontier clusters
     front_mat = 1 - skimage.morphology.binary_dilation(
         frontier_clusters, selem) != True
-    colored = fill_color(colored, front_mat, pal[9])
+    colored = fill_color(colored, front_mat, pal[9])  # dark purple
 
-    #goal map
+    # goal map
     global flag
 
     if change_goal_flag:
        flag = not flag
 
-    if flag: # if change_goal_flag is False (should always be the case), then flag=True, and this line is executed (explored colour).
-        colored = fill_color(colored, goal_mat, current_palette[0]) #blue
-    else: # this should never happen.
-        colored = fill_color(colored, goal_mat, current_palette[1]) #orange
+    # if change_goal_flag is False (should always), then flag=True, and this line is executed (explored colour).
+    if flag:
+        colored = fill_color(colored, goal_mat, pal[0])  # light blue
+    else:  # this should never happen.
+        colored = fill_color(colored, goal_mat, pal[2])  # light green
 
-    colored = fill_color(colored, goal_mat2, current_palette[2]) #green
+    colored = fill_color(colored, goal_mat2, pal[1])  # dark blue
 
     colored = 1 - colored
     colored *= 255

@@ -35,31 +35,37 @@ class MapBuilder(object):
         self.agent_view_angle = params['agent_view_angle']
         return
 
-    def update_map(self, depth, current_pose):
+    def update_map(self, depth, current_pose):  # depth image, [pose_x_cm, pose_y_cm, ori_deg]
         with np.errstate(invalid="ignore"):
-            depth[depth > self.vision_range * self.resolution] = np.NaN
+            depth[depth > self.vision_range * self.resolution] = np.NaN  # 64 blocks * 5cm/map_block = 320 cm.
         point_cloud = du.get_point_cloud_from_z(depth, self.camera_matrix, \
                                                 scale=self.du_scale)
 
+        #  3D point cloud adjusted for camera view
         agent_view = du.transform_camera_view(point_cloud,
-                                              self.agent_height,
-                                              self.agent_view_angle)
+                                              self.agent_height,  # 1.25m
+                                              self.agent_view_angle)  # 0
 
-        shift_loc = [self.vision_range * self.resolution // 2, 0, np.pi / 2.0]
+        #  3D point cloud adjusted for position
+        shift_loc = [self.vision_range * self.resolution // 2, 0, np.pi / 2.0]  # [160, 0, pi/2 = 90 deg]
         agent_view_centered = du.transform_pose(agent_view, shift_loc)
 
+        #  bins 3D point cloud into xy-z bins of [above 25cm, between 25-150cm, above 150cm]
         agent_view_flat = du.bin_points(
             agent_view_centered,
             self.vision_range,
             self.z_bins,
             self.resolution)
 
+        # simplifying/cropping point cloud into just the middle z range.
         agent_view_cropped = agent_view_flat[:, :, 1]
 
-        agent_view_cropped = agent_view_cropped / self.obs_threshold
+        # making the map binary. This is fp_proj.
+        agent_view_cropped = agent_view_cropped / self.obs_threshold  # threshold = 1
         agent_view_cropped[agent_view_cropped >= 0.5] = 1.0
         agent_view_cropped[agent_view_cropped < 0.5] = 0.0
 
+        # explored
         agent_view_explored = agent_view_flat.sum(2)
         agent_view_explored[agent_view_explored > 0] = 1.0
 
@@ -73,11 +79,11 @@ class MapBuilder(object):
 
         self.map = self.map + geocentric_flat 
 
-        map_gt = self.map[:, :, 1] / self.obs_threshold #(=1), map_gt = occupancy map
+        map_gt = self.map[:, :, 1] / self.obs_threshold  # (=1), map_gt = occupancy map
         map_gt[map_gt >= 0.5] = 1.0
         map_gt[map_gt < 0.5] = 0.0
 
-        explored_gt = self.map.sum(2)
+        explored_gt = self.map.sum(2)  # sum along 2nd axis
         explored_gt[explored_gt > 1] = 1.0
         new_explored = geocentric_flat.sum(2)
         new_explored[new_explored > 1] = 1.0

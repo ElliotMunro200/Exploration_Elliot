@@ -167,8 +167,6 @@ class Exploration_Env(habitat.RLEnv):
             full_map_size = args.map_size_cm//args.map_resolution
             self.explorable_map = self._get_gt_map(full_map_size)
         self.prev_explored_area = 0.
-        self.prev_explored_local_area = 0.
-        
 
         # Preprocess observations
         rgb = obs['rgb'].astype(np.uint8)
@@ -181,7 +179,8 @@ class Exploration_Env(habitat.RLEnv):
         # Initialize map and pose
         self.map_size_cm = args.map_size_cm
         self.mapper.reset_map(self.map_size_cm)
-        self.loc_0 = [int(self.map_size_cm/100.0/2.0), int(self.map_size_cm/100.0/2.0), int(0.)]
+        self.loc_0 = [int(full_map_size/2), int(full_map_size/2), 0]
+        self.explore_prop = 0.
         self.curr_loc = [self.map_size_cm/100.0/2.0,
                          self.map_size_cm/100.0/2.0, 0.]
         self.curr_loc_gt = self.curr_loc
@@ -331,11 +330,8 @@ class Exploration_Env(habitat.RLEnv):
                                     np.deg2rad(self.curr_loc_gt[2])]
 
 
-        if self.timestep%args.num_local_steps==0:
-            if args.num_local_steps > 1:    
-                area, ratio = self.get_global_reward_old()
-            elif args.num_local_steps == 1:
-                area, ratio = self.get_local_explore_reward()
+        if self.timestep % args.num_local_steps == 0:
+            area, ratio = self.get_crafted_reward()
             self.info['exp_reward'] = area 
             self.info['exp_ratio'] = ratio
         else:
@@ -370,34 +366,27 @@ class Exploration_Env(habitat.RLEnv):
         # This function is not used, Habitat-RLEnv requires this function
         return 0.
 
-    def get_local_explore_reward(self):
-        curr_explored_local = self.explored_map[self.loc_0[1]-self.local_explore_width:self.loc_0[1]+self.local_explore_width+1,
-                                                self.loc_0[0]-self.local_explore_width:self.loc_0[0]+self.local_explore_width+1] #(512,512) means 5cm per block. 
-        curr_explored_local_area = curr_explored_local.sum() #summing the current explored amount.
-
-        reward_scale = (2*self.local_explore_width+1)**2 #finding the total area of the map
-        m_reward = (curr_explored_local_area - self.prev_explored_local_area)*1. #finding the amount explored on the last step
-        m_ratio = m_reward/reward_scale #the explored prop progress on this episode.
-        m_reward = m_reward * 25./10000. # converting to m^2.
-        self.prev_explored_local_area = curr_explored_local_area # updating the previously explored area for use on the next step.
-
-        m_reward *= 0.02 # Reward Scaling
-
-        return m_reward, m_ratio
-
-    def get_global_reward_old(self):#old reward not used
-        curr_explored = self.explored_map#*self.explorable_map
+    def get_crafted_reward(self):  # this reward function is used
+        curr_explored = self.explored_map * self.explorable_map
+        explorable = self.explorable_map
+        if self.local_explore_width:  # if local explore width given, scale to local region.
+            curr_explored = curr_explored[self.loc_0[1] - self.local_explore_width:self.loc_0[1] + self.local_explore_width + 1,
+                        self.loc_0[0] - self.local_explore_width:self.loc_0[0] + self.local_explore_width + 1]
+            explorable = explorable[self.loc_0[1] - self.local_explore_width:self.loc_0[1] + self.local_explore_width + 1,
+                          self.loc_0[0] - self.local_explore_width:self.loc_0[0] + self.local_explore_width + 1]
         curr_explored_area = curr_explored.sum()
+        explorable_area = explorable.sum()
 
-        reward_scale = self.explorable_map.sum()
-        m_reward = (curr_explored_area - self.prev_explored_area)*1.
-        m_ratio = m_reward/reward_scale
-        m_reward = m_reward * 25./10000. # converting to m^2
+        curr_explore_ratio = curr_explored_area / explorable_area
+        self.explore_prop = curr_explore_ratio
+
+        step_explored_area = (curr_explored_area - self.prev_explored_area)*1.
+        step_explore_reward = step_explored_area / explorable_area
+        step_explore_reward = step_explore_reward * 25./10000.  # converting to m^2
+        step_explore_reward *= 0.02  # Reward Scaling
         self.prev_explored_area = curr_explored_area
 
-        m_reward *= 0.02 # Reward Scaling
-
-        return m_reward, m_ratio
+        return step_explore_reward, curr_explore_ratio
 
     def get_global_reward_old2(self):
         self.new_explored = self.new_explored*self.explorable_map
@@ -658,13 +647,9 @@ class Exploration_Env(habitat.RLEnv):
                             self.dump_dir, self.rank+1, self.episode_no)
             if not os.path.exists(ep_dir):
                 os.makedirs(ep_dir)
-            
-            numerator = self.explored_map * self.explorable_map
-            denominator = self.explorable_map
-            if self.local_explore_width: # if local explore width given, scale to local region.
-                numerator = numerator[256-self.local_explore_width:256+self.local_explore_width+1,256-self.local_explore_width:256+self.local_explore_width+1]
-                denominator = denominator[256-self.local_explore_width:256+self.local_explore_width+1,256-self.local_explore_width:256+self.local_explore_width+1]
-            self.num_explored.append(np.sum(numerator)/np.sum(denominator))
+
+            # if local explore width given, is scaled to local region.
+            self.num_explored.append(self.explore_prop)
             self.num_forward.append(self.num_forward_step)
 
             #if self.rank != 0:
