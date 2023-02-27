@@ -604,13 +604,16 @@ def main():
             # ------------------------------------------------------------------want to save 1 model per training run
             # Save model (once after last step of last episode)
             if ep_num == num_episodes - 1:
+                if step == args.max_episode_length - 1:
+                    torch.save(g_policy.state_dict(),
+                               os.path.join(log_dir, "model_best.global"))
                 # Save Global Policy Model (if model is at the best performance of the minimum 100 episodes trained this run)
-                if len(g_episode_rewards) >= 100 and \
+                elif len(g_episode_rewards) >= 100 and \
                         (np.mean(g_episode_rewards) >= best_g_reward) \
                         and not args.eval:
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, "model_best.global")) #is: "./tmp//models/exp#/model_best.global"
-                    best_g_reward = np.mean(g_episode_rewards)
+                best_g_reward = np.mean(g_episode_rewards)
             # ------------------------------------------------------------------
     def plot(data):
         len_data = len(data)

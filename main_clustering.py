@@ -486,7 +486,7 @@ def main():
             #print(current_option)
             action = torch.from_numpy(action)
             print(action)
-            sys.exit("Error message")
+            
             obs, rew, done, infos = envs.step(action)
 
             g_masks = torch.FloatTensor([0 if x else 1
