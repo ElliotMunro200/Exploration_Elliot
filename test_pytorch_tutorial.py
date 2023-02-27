@@ -124,18 +124,3 @@ def py_torch_dataset():
 
 if __name__ == "__main__":
     LogReg()
-"""
-Defaults for local_explore_args: python main_clustering.py --num_maps=5 --num_episodes=100 
---eval=0 --exp_name="exp_local" 
---load_global=0 --task_config="tasks/pointnav_gibson.yaml" --split="train" 
---num_global_steps=25 --num_local_steps=1
-
-python main_clustering.py --num_maps=5 --num_episodes=1 --eval=0 --exp_name="exp11" --load_global=0 --task_config="tasks/pointnav_gibson.yaml" --split="train" --num_global_steps=40 --num_local_steps=25 &&
-python main_clustering.py --num_maps=6 --num_episodes=2 --eval=0 --exp_name="exp12" --load_global=0 --task_config="tasks/pointnav_mp3d.yaml" --split="train" --num_global_steps=20 --num_local_steps=50 &&
-python main_clustering.py --num_maps=5 --num_episodes=4 --eval=0 --exp_name="exp13" --load_global=0 --task_config="tasks/pointnav_gibson.yaml" --split="train" --num_global_steps=40 --num_local_steps=25 &&
-python main_clustering.py --num_maps=6 --num_episodes=3 --eval=0 --exp_name="exp14" --load_global=0 --task_config="tasks/pointnav_mp3d.yaml" --split="train" --num_global_steps=20 --num_local_steps=50 &&
-python main_clustering.py --num_maps=5 --num_episodes=5 --eval=1 --exp_name="exp11" --load_global="./tmp/models/exp11/model_best.global" --task_config="tasks/pointnav_gibson.yaml" --split="val" --num_global_steps=40 --num_local_steps=25 &&
-python main_clustering.py --num_maps=6 --num_episodes=5 --eval=1 --exp_name="exp12" --load_global="./tmp/models/exp12/model_best.global" --task_config="tasks/pointnav_mp3d.yaml" --split="test" --num_global_steps=20 --num_local_steps=50 &&
-python main_clustering.py --num_maps=5 --num_episodes=5 --eval=1 --exp_name="exp13" --load_global="./tmp/models/exp13/model_best.global" --task_config="tasks/pointnav_gibson.yaml" --split="val" --num_global_steps=40 --num_local_steps=25 &&
-python main_clustering.py --num_maps=6 --num_episodes=5 --eval=1 --exp_name="exp14" --load_global="./tmp/models/exp14/model_best.global" --task_config="tasks/pointnav_mp3d.yaml" --split="test" --num_global_steps=20 --num_local_steps=50
-"""

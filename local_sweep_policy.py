@@ -485,13 +485,13 @@ def main():
             plt.pause(0.001)
 
 
-            g_process_rewards += g_reward.cpu().numpy() #g_process_rewards = np.zeros((num_scenes))
+            g_process_rewards += g_reward.cpu().numpy() # g_process_rewards = np.zeros((num_scenes))
             # is a dynamically updated array of total rewards for the episode.
-            g_total_rewards = g_process_rewards * (1 - g_masks.cpu().numpy()) #g_masks = [0 if done, 1 not done, for each e] 
-            g_process_rewards *= g_masks.cpu().numpy() #when the episode is done, the masks will be 0, the process rewards will go to 0, and the total rewards go to the full amount.
-            per_step_g_rewards.append(np.mean(g_reward.cpu().numpy())) #mean reward for the step across all actions.
+            g_total_rewards = g_process_rewards * (1 - g_masks.cpu().numpy()) # g_masks = [0 if done, 1 not done, for each e]
+            g_process_rewards *= g_masks.cpu().numpy() # when the episode is done, the masks will be 0, the process rewards will go to 0, and the total rewards go to the full amount.
+            per_step_g_rewards.append(np.mean(g_reward.cpu().numpy())) # mean reward for the step across all actions.
 
-            #appending the nonzero episode rewards to the g_episode_rewards deque (every step).
+            # appending the nonzero episode rewards to the g_episode_rewards deque (every step).
             if np.sum(g_total_rewards) != 0:
                 for tr in g_total_rewards:
                     g_episode_rewards.append(tr) if tr != 0 else None
@@ -502,7 +502,7 @@ def main():
                 g_action, g_action_log_prob, g_value, current_option,
                 g_reward.detach(), g_masks, global_orientation
             )                
-            #need to see how this works.
+            # need to see how this works.
             g_action, g_value, g_action_log_prob, g_rec_states = \
                 g_policy.act(
                     g_rollouts.obs[step + 1],
