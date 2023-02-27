@@ -35,7 +35,7 @@ class MapBuilder(object):
         self.agent_view_angle = params['agent_view_angle']
         return
 
-    def update_map(self, depth, current_pose):  # depth image, [pose_x_cm, pose_y_cm, ori_deg]
+    def update_map(self, depth, current_pose):  # depth image shape(256,256) values (95.0-250.0), max_value (at 111,81), [pose_x_cm, pose_y_cm, ori_deg] = 1280.0,1280.0,0.0
         with np.errstate(invalid="ignore"):
             depth[depth > self.vision_range * self.resolution] = np.NaN  # 64 blocks * 5cm/map_block = 320 cm.
         point_cloud = du.get_point_cloud_from_z(depth, self.camera_matrix, \
