@@ -601,8 +601,6 @@ def main():
                 logging.info(log)
             # ------------------------------------------------------------------
             
-            best_g_reward = np.mean(g_episode_rewards)
-            
             # ------------------------------------------------------------------
             # End of training run model saving
             if (step == args.max_episode_length - 1) and not args.eval:
@@ -618,11 +616,12 @@ def main():
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, model_save_name)) 
                 # If model is at the best performance of the minimum 100 episodes trained this run
-                if len(g_episode_rewards) >= 100 and (np.mean(g_episode_rewards) >= best_g_reward):
+                if len(g_episode_rewards) >= num_scenes*25 and (np.mean(g_episode_rewards) >= best_g_reward):
                     model_save_name = f"model_best.global"
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, model_save_name)) 
             
+                best_g_reward = np.mean(g_episode_rewards)
             # ------------------------------------------------------------------
     def plot(data):
         len_data = len(data)
