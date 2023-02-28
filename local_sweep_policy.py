@@ -296,8 +296,8 @@ def main():
         state_dict = torch.load(args.load_global, # loads an object saved with torch.save() from a file.
                                 map_location=lambda storage, loc: storage) # default deserialization to cpu is used.
         g_policy.load_state_dict(state_dict) #Loading deserialized state_dict into the model. 
-        #saving the model parameters as a serialized state_dict. Default location is: "./tmp//models/exp1/model_best_gibson_version.global".
-        torch.save(g_policy.state_dict(), os.path.join(log_dir, "model_best_gibson_version.global"), _use_new_zipfile_serialization=False)
+        #saving the model parameters as a serialized state_dict. Default location is: "./tmp//models/exp1/last_loaded_gibson_version.global".
+        torch.save(g_policy.state_dict(), os.path.join(log_dir, "model_best_last_loaded_version.global"), _use_new_zipfile_serialization=False)
 
     if not args.train_global: #def=1
         g_policy.eval() # dropout and batchnorm and maybe other layers behave differently when in eval mode (self.training=False).
@@ -600,20 +600,29 @@ def main():
                 print(log)
                 logging.info(log)
             # ------------------------------------------------------------------
-
-            # ------------------------------------------------------------------want to save 1 model per training run
-            # Save model (once after last step of last episode)
-            if ep_num == num_episodes - 1:
-                if step == args.max_episode_length - 1:
+            
+            best_g_reward = np.mean(g_episode_rewards)
+            
+            # ------------------------------------------------------------------
+            # End of training run model saving
+            if (step == args.max_episode_length - 1) and not args.eval:
+                # Once after last step of last episode
+                if ep_num == num_episodes - 1:
+                    #is: "./tmp//models/exp#/model_last.global"
+                    model_save_name = f"model_last.global" 
                     torch.save(g_policy.state_dict(),
-                               os.path.join(log_dir, "model_best.global"))
-                # Save Global Policy Model (if model is at the best performance of the minimum 100 episodes trained this run)
-                elif len(g_episode_rewards) >= 100 and \
-                        (np.mean(g_episode_rewards) >= best_g_reward) \
-                        and not args.eval:
+                               os.path.join(log_dir, model_save_name))
+                # If 5th of way through episodes
+                elif (ep_num+1) % (num_episodes/5) == 0:
+                    model_save_name = f"model_ep_{ep_num+1}.global"
                     torch.save(g_policy.state_dict(),
-                               os.path.join(log_dir, "model_best.global")) #is: "./tmp//models/exp#/model_best.global"
-                best_g_reward = np.mean(g_episode_rewards)
+                               os.path.join(log_dir, model_save_name)) 
+                # If model is at the best performance of the minimum 100 episodes trained this run
+                elif len(g_episode_rewards) >= 100 and (np.mean(g_episode_rewards) >= best_g_reward):
+                    model_save_name = f"model_best.global"
+                    torch.save(g_policy.state_dict(),
+                               os.path.join(log_dir, model_save_name)) 
+            
             # ------------------------------------------------------------------
     def plot(data):
         len_data = len(data)
@@ -666,8 +675,13 @@ def main():
         print(log)
         logging.info(log)
     
-    
-    print(f"TOTAL TIME: {time_elapsed}")
+    end = time.time()
+    time_elapsed = time.gmtime(end - start)
+    print_time = time.strftime("%Hh %Mm %Ss", time_elapsed)
+    print(f"end: {end}")
+    print(f"start: {start}")
+    print(f"time_gm: {time_elapsed}")
+    print(f"TOTAL TIME: {print_time}")
 
 
 if __name__ == "__main__":

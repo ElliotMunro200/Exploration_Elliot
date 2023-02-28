@@ -18,7 +18,7 @@ def get_args():
                                 and training on gpus """)
     parser.add_argument('--num_processes_per_gpu', type=int, default=14)
     parser.add_argument('--num_processes_on_first_gpu', type=int, default=0)
-    parser.add_argument('--num_episodes', type=int, default=1000,
+    parser.add_argument('-ne', '--num_episodes', type=int, default=1000,
                         help='number of training episodes (default: 100)')
     parser.add_argument('--no_cuda', action='store_true', default=False,
                         help='disables CUDA training')
@@ -52,7 +52,7 @@ def get_args():
     parser.add_argument('-exp_output', '--exp_output', type=str, default="exp_data/",
                         help='path to dump experiments data')
     parser.add_argument('--exp_name', type=str, default="exp_local",
-                        help='experiment name (default: exp1)')
+                        help='experiment name (default: exp_local)')
     parser.add_argument('--save_periodic', type=int, default=30000,
                         help='Model save frequency in number of updates')
     parser.add_argument('--load_slam', type=str, default="0",
