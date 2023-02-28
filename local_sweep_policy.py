@@ -613,12 +613,12 @@ def main():
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, model_save_name))
                 # If 5th of way through episodes
-                elif (ep_num+1) % (num_episodes/5) == 0:
+                if (ep_num+1) % (num_episodes/5) == 0:
                     model_save_name = f"model_ep_{ep_num+1}.global"
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, model_save_name)) 
                 # If model is at the best performance of the minimum 100 episodes trained this run
-                elif len(g_episode_rewards) >= 100 and (np.mean(g_episode_rewards) >= best_g_reward):
+                if len(g_episode_rewards) >= 100 and (np.mean(g_episode_rewards) >= best_g_reward):
                     model_save_name = f"model_best.global"
                     torch.save(g_policy.state_dict(),
                                os.path.join(log_dir, model_save_name)) 
