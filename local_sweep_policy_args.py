@@ -39,7 +39,7 @@ def get_args():
     parser.add_argument('--train_slam', type=int, default=1,
                         help="""0: Do not train the Neural SLAM Module
                                 1: Train the Neural SLAM Module (default: 1)""")
-    parser.add_argument('--local_explore_width', type=int, default=32)
+    parser.add_argument('-lew', '--local_explore_width', type=int, default=32)
 
     # Logging, loading models, visualization
     parser.add_argument('--log_interval', type=int, default=10,
@@ -97,7 +97,7 @@ def get_args():
                         help="agent camera height in metres")
     parser.add_argument('--hfov', type=float, default=90.0,
                         help="horizontal field of view in degrees")
-    parser.add_argument('--randomize_env_every', type=int, default=1000,
+    parser.add_argument('--randomize_env_every', type=int, default=0,
                         help="randomize scene in a thread every k episodes")
 
     ## Global Policy RL PPO Hyperparameters
@@ -241,13 +241,8 @@ def get_args():
             print("Number of processes per GPU: {}".format(
                                       args.num_processes_per_gpu))
 
-    if args.eval == 1:
-        if args.train_global:
-            print("WARNING: Training Global Policy during evaluation")
-        if args.train_local:
-            print("WARNING: Training Local Policy during evaluation")
-        if args.train_slam:
-            print("WARNING: Training Neural SLAM module during evaluation")
+    #if args.eval == 1:
+    #    args.train_global = 0
 
     assert args.short_goal_dist >= 1, "args.short_goal_dist >= 1"
 

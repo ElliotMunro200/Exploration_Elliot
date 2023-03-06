@@ -97,7 +97,7 @@ def get_args():
                         help="agent camera height in metres")
     parser.add_argument('--hfov', type=float, default=90.0,
                         help="horizontal field of view in degrees")
-    parser.add_argument('--randomize_env_every', type=int, default=1000,
+    parser.add_argument('--randomize_env_every', type=int, default=0,
                         help="randomize scene in a thread every k episodes")
 
     ## Global Policy RL PPO Hyperparameters

@@ -345,8 +345,9 @@ class Exploration_Env(habitat.RLEnv):
             done = True
 
             if self.args.eval == 1: #testing phase only
-                mat_dir = f"{self.args.exp_output}{self.args.exp_name}/" # is "./tmp/exp_data/exp#/"
+                mat_dir = f"{self.args.exp_output}{self.args.exp_name}/" # is "exp_data/exp#/"
                 if not os.path.exists(mat_dir):
+                    print(mat_dir)                    
                     os.makedirs(mat_dir)
                 savemat(f"{mat_dir}{self.rank}-{self.episode_no}.mat", {"num_explored": self.num_explored,"num_forward": self.num_forward,"gt_area": self.gt_area})
                 

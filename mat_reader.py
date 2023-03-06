@@ -26,13 +26,13 @@ def plot_short(full_data):
         plt.plot(t, full_data[method], format_strings[method], label=f"{exp_names[method]}")
     plt.legend()
     plt.tick_params(labeltop=False, labelright=True)
-    plt.axis([0,1000,0,1.2])
+    plt.axis([0,len_data,0,1.2])
     plt.xlabel('Timesteps')
     plt.ylabel('Coverage')
     plt.title('Exploration')
     for i in np.arange(0,1.2,0.25):
         plt.axhline(y=i, color='k', ls = ':')
-    for i in range(0,1000,250):
+    for i in np.arange(0,len_data,len_data/5):
         plt.axvline(x=i, color='r', ls = '--')
 
     fn = f"{read_dir}TestVis.png"
@@ -74,11 +74,13 @@ def mat_reader_short(exp_dir, num_scenes):
             explored_prop_by_timestep = mat["num_explored"][0]
             if ep == 1 and len(explored_prop_by_timestep) == (len_data - 1): # to account for 999 timesteps of ep=1 (instead of 1000 timesteps) of each run.
                 explored_prop_by_timestep = np.append(explored_prop_by_timestep, explored_prop_by_timestep[-1])
-            print(explored_prop_by_timestep[-1])
+            #print(explored_prop_by_timestep)
             by_timestep_scene[scene,:] = explored_prop_by_timestep
         by_timestep_scene_avg = by_timestep_scene.mean(axis=0)
-        by_timestep_all[ep-ep0,:] = by_timestep_scene_avg
+        #print(by_timestep_scene_avg)
+        by_timestep_all[ep-ep0,:] = by_timestep_scene_avg    
     by_timestep_all_avg = by_timestep_all.mean(axis=0)
+    print(by_timestep_all_avg)
     return by_timestep_all_avg
 
 def mat_reader_long(exp_dir, num_scenes):
@@ -92,7 +94,7 @@ def mat_reader_long(exp_dir, num_scenes):
             mat = scipy.io.loadmat(full_dir)
             #print(f"LOADED FROM: {full_dir}")
             explored_props = mat["num_explored"][0]
-            print(explored_props)
+            #print(explored_props)
             by_episode_scene[scene] = explored_props[-1]
         by_episode_scene_avg = by_episode_scene.mean(axis=0)
         by_episode_all[ep-ep0] = by_episode_scene_avg
@@ -136,7 +138,7 @@ print(f"CORRECTED TIMESTEPS OF DATA: {len_data}")
 num_scenes = args.num_scenes
 
 #format list for plotting of different methods
-format_strings = ['b','r-.','g--','m-.']
+format_strings = ['b','r-.','g--','m-.','yx:','co-']
 
 #plotting each method on the one graph with the mat_reader for the desired function (i.e. "short" or "long")
 print(f"PLOTTING WITH FUNCTION: {args.function}")
@@ -146,7 +148,7 @@ if args.function == "short":
     for method in range(num_methods):
         print(f"METHOD FROM: {read_dir}{exp_names[method]}")
         data = mat_reader_short(exp_names[method], num_scenes)
-    full_data[method,:] = data
+        full_data[method,:] = data
     plot_short(full_data)
 
 elif args.function == "long":
@@ -154,7 +156,7 @@ elif args.function == "long":
     for method in range(num_methods):
         print(f"METHOD FROM: {read_dir}{exp_names[method]}")
         data = mat_reader_long(exp_names[method], num_scenes)
-    full_data[method,:] = data
+        full_data[method,:] = data
     plot_long(full_data)
 
 
