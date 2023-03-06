@@ -242,12 +242,7 @@ def get_args():
                                       args.num_processes_per_gpu))
 
     if args.eval == 1:
-        if args.train_global:
-            print("WARNING: Training Global Policy during evaluation")
-        if args.train_local:
-            print("WARNING: Training Local Policy during evaluation")
-        if args.train_slam:
-            print("WARNING: Training Neural SLAM module during evaluation")
+        args.train_global = 0
 
     assert args.short_goal_dist >= 1, "args.short_goal_dist >= 1"
 

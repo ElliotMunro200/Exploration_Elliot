@@ -521,7 +521,7 @@ def main():
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
-            if step == args.max_episode_length - 1: #end of (25) step episode.
+            if step == args.max_episode_length - 1: # end of (25) step episode.
                 # print rewards
                 ep_rew_by_scene = np.sum(g_reward_all, axis=0)
                 for e, rew in enumerate(ep_rew_by_scene):

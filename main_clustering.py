@@ -138,6 +138,9 @@ def main():
     #plots
     plt.ion()
     fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke") # plotting terminations, values, options and their losses.
+    if len(np.shape(ax))==1:
+        ax = np.expand_dims(ax, axis=1)
+
     plt.pause(0.001)
 
     if args.eval:
@@ -624,10 +627,10 @@ def main():
 
                     ax[4,e].plot(g_reward_all[:,e])
 
-                ax[3,0].plot(g_value_losses)
-                ax[3,1].plot(g_termination_losses)
-                ax[3,2].plot(g_action_losses)
-                ax[3,3].plot(g_dist_entropies)
+                #ax[3,0].plot(g_value_losses)
+                #ax[3,1].plot(g_termination_losses)
+                #ax[3,2].plot(g_action_losses)
+                #ax[3,3].plot(g_dist_entropies)
 
                 plt.gcf().canvas.flush_events()
                 fig.canvas.start_event_loop(0.001)
@@ -697,7 +700,7 @@ def main():
 
                 
                 # Train Global Policy (only trains g_policy once per episode - through "g_agent.update(g_rollouts)").
-                if g_step % args.num_global_steps == args.num_global_steps - 1: # "if on final episode macro: ...".
+                if g_step % args.num_global_steps == args.num_global_steps - 1: # "if on final macro of the episode: ...".
                     print("#######Training Global Policy#######")
                     
                     g_next_value, g_terminations = g_policy.get_value(
