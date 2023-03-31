@@ -22,7 +22,7 @@ from utils.storage import GlobalRolloutStorage #, FIFOMemory
 #from utils.optimization import get_optimizer
 
 import algo
-from model import RL_Policy
+from model_m2l import RL_Policy
 from clustering import frontier_clustering
 
 import sys
@@ -345,7 +345,6 @@ def main():
             deterministic=False
         )
 
-
     g_action, g_action_log_prob, g_rec_states = \
         g_policy.act(
             g_rollouts.obs[0],
@@ -398,7 +397,7 @@ def main():
             action = np.zeros(num_scenes)
             for e in range(num_scenes):
                 change_goal = False
-                if current_option[e] == 1: #rotate
+                if current_option[e] == 1 and False: #rotate
                     if local_step_count[e] == 0: #reset rotation degree
                         cpu_actions = nn.Tanh()(g_action[e,0]).cpu().numpy() 
                         local_step_count_rot[e] = int(cpu_actions * 180 / 10) # 0 -> 14
@@ -425,6 +424,13 @@ def main():
                         action[e] = 0
 
                     local_step_count[e] -= 1
+
+                elif True:
+                    action[e] = g_action[e,0].cpu().squeeze(dim=0).numpy().astype(np.float64)
+                    print(f"ACTION CHOSEN: {action[e]}")
+                    local_step_count[e] = 1
+                    if (step+1) % args.num_local_steps == 0:
+                        local_step_count[e] = 0  
 
                 else: #navigation
                     if local_step_count[e] == 0: #reset step count for macro.
@@ -660,13 +666,10 @@ def main():
                         extras=g_rollouts.extras[g_step + 1],
                         deterministic=False
                     )
-
                 
                 for e in range(num_scenes):
-                    print("Beta: " + str(e))
-                    print(g_termination[e,current_option[e]])  
-                    if bool(Bernoulli(g_termination[e,current_option[e]]).sample().item()):
-                        current_option[e] = np.random.choice(2) if np.random.rand() < g_policy.epsilon() else g_option[e]
+                    print(f"TERMINATION {e}: {g_termination}")  
+                    current_option[e] = 1
                 
 
                 g_action, g_action_log_prob, g_rec_states = \
