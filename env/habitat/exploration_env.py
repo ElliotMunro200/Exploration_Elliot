@@ -655,6 +655,7 @@ class Exploration_Env(habitat.RLEnv):
 
             #if self.rank != 0:
             #    return
+            #
             vis_grid = vu.get_colored_map(self.map,
                             self.collison_map,
                             self.visited_gt,
@@ -674,7 +675,7 @@ class Exploration_Env(habitat.RLEnv):
             else:
                 args.print_images = 0
             '''
-
+            # update the live updated 4-part figures, depends on coloured map vis_grid (2nd of 4 windows)
             vu.visualize(option, self.figure, self.ax, self.obs, vis_grid[:,:,::-1], self.fmm_dist, self.num_explored, #(1 - self.explorable_map)*self.map 
                         (start_x_gt, start_y_gt, start_o_gt),
                         (self.goal[0], self.goal[1]),

@@ -16,11 +16,12 @@ import gym
 import logging
 from arguments import get_args
 from env import make_vec_envs
+
 from utils.storage import GlobalRolloutStorage #, FIFOMemory
 #from utils.optimization import get_optimizer
-from model import RL_Policy 
 
 import algo
+from model import RL_Policy
 
 import sys
 import matplotlib

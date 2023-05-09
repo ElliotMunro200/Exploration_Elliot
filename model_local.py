@@ -22,8 +22,7 @@ class Global_Policy(NNBase):
         super(Global_Policy, self).__init__(recurrent, hidden_size,
                                             hidden_size)
 
-        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.) #=256, input = (5/6, 512, 512) 
-
+        out_size = int(input_shape[1] / 32. * input_shape[2] / 32.)  # =256, input = (5/6, 512, 512)
 
         config = get_args()
         config.box_code_size = 32
@@ -47,21 +46,20 @@ class Global_Policy(NNBase):
         incre = 1000
         config.epochs = 50
         config.num_maps = input_shape[0]
-        
 
         self.encoder = ROctEncoder(config)
         # (5, 512, 512) --> (512)
-        self.box_encoder = BoxEncoder(num_maps=config.num_maps, input_size = config.box_code_size, feature_size=config.feature_size)
+        self.box_encoder = BoxEncoder(num_maps=config.num_maps, input_size=config.box_code_size,
+                                      feature_size=config.feature_size)
         # (512) --> (512)
         self.tree_classifier = TreeClassifier(feature_size=config.feature_size, hidden_size=config.hidden_size)
 
         self.linear1 = nn.Linear(config.feature_size + 8 + 512, hidden_size)
         self.linear2 = nn.Linear(hidden_size, 256)
         self.orientation_emb = nn.Embedding(72, 8)
-        self.train() # set in training mode
+        self.train()  # set in training mode
 
     def forward(self, inputs, rnn_hxs, visual_feature, masks, extras):
-
         x = self.tree_classifier(self.box_encoder(inputs))
 
         orientation_emb = self.orientation_emb(extras).squeeze(1)
@@ -89,7 +87,7 @@ class Visual_Encoder(NNBase):
                  hidden_size=512, deterministic=False):
 
         super(Visual_Encoder, self).__init__(recurrent, hidden_size,
-                                              hidden_size)
+                                             hidden_size)
 
         self.deterministic = deterministic
         self.dropout = 0.5
@@ -133,30 +131,30 @@ class Visual_Encoder(NNBase):
 class RL_Policy(nn.Module):
 
     def __init__(self, obs_shape, action_space_discrete, action_space_box,
-                  observation_space_shape, hidden_size, use_deterministic_local, device, model_type=0, base_kwargs=None):
+                 observation_space_shape, hidden_size, use_deterministic_local, device, model_type=0, base_kwargs=None):
 
         super(RL_Policy, self).__init__()
         if base_kwargs is None:
             base_kwargs = {}
-        
+
         if model_type == 0:
             self.visual_encoder = Visual_Encoder(observation_space_shape,
-                               hidden_size=hidden_size,
-                               deterministic=use_deterministic_local)
+                                                 hidden_size=hidden_size,
+                                                 deterministic=use_deterministic_local)
 
             self.network = Global_Policy(obs_shape, **base_kwargs)
         else:
             raise NotImplementedError
 
         num_outputs = action_space_discrete.n
-        #self.dist_discrete = Categorical(self.network.output_size, num_outputs)
-        self.dist_discrete = DiagGaussian(self.network.output_size, 1) #(256,1) size Linear
+        # self.dist_discrete = Categorical(self.network.output_size, num_outputs)
+        self.dist_discrete = DiagGaussian(self.network.output_size, 1)  # (256,1) size Linear
 
-        num_outputs = action_space_box.shape[0] 
-        self.dist_box = DiagGaussian(self.network.output_size, num_outputs) #(256,2) size Linear
+        num_outputs = action_space_box.shape[0]
+        self.dist_box = DiagGaussian(self.network.output_size, num_outputs)  # (256,2) size Linear
 
-        self.critic_linear = nn.Linear(256, 2)  #value
-        self.terminations = nn.Linear(256, 2)  #termination probabilty
+        self.critic_linear = nn.Linear(256, 2)  # value
+        self.terminations = nn.Linear(256, 2)  # termination probabilty
         self.model_type = model_type
         self.num_steps = 0
         self.device = device
@@ -173,43 +171,44 @@ class RL_Policy(nn.Module):
     def forward(self, inputs, rnn_hxs, rgb, masks, extras):
         if extras is None:
             visual_feature = self.visual_encoder(rgb, masks)
-            return self.network(inputs, rnn_hxs, visual_feature , masks)
+            return self.network(inputs, rnn_hxs, visual_feature, masks)
         else:
             visual_feature = self.visual_encoder(rgb, masks)
             return self.network(inputs, rnn_hxs, visual_feature, masks, extras)
 
     def act(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
-        
+
         action_log_probs = torch.zeros(len(option)).to(self.device)
-        action = torch.zeros(len(option),3).to(self.device)
+        action = torch.zeros(len(option), 3).to(self.device)
 
         for e in range(len(option)):
 
-            if option[e] == 1: #rotate, explore: f l r ?
-                dist = self.dist_discrete(actor_features[e]) #FixedNormal distribution
-                if deterministic: 
-                    action[e,0] = dist.mode()
-                else: #default is deterministic=False.
-                    action[e,0] = dist.sample() #sampling from Normal dist Linear(actor_features[e]) --> mean[e] . N(mean[e],sigma).sample().
-                action_log_probs[e] = dist.log_probs(action[e,0])
-            else: # navigation goal point
+            if option[e] == 1:  # rotate, explore: f l r ?
+                dist = self.dist_discrete(actor_features[e])  # FixedNormal distribution
+                if deterministic:
+                    action[e, 0] = dist.mode()
+                else:  # default is deterministic=False.
+                    action[
+                        e, 0] = dist.sample()  # sampling from Normal dist Linear(actor_features[e]) --> mean[e] . N(mean[e],sigma).sample().
+                action_log_probs[e] = dist.log_probs(action[e, 0])
+            else:  # navigation goal point
                 dist = self.dist_box(actor_features[e].unsqueeze(0))
-                if deterministic: 
-                    action[e,1:] = dist.mode()
-                else: #default is deterministic=False.
-                    action[e,1:] = dist.sample() # same as above, but 2 means and 2 sigmas for each [e]. The 2 N(m,s) for each [e] are separately determined by the Linear(a_feat[e]).
-                action_log_probs[e] = dist.log_probs(action[e,1:])
+                if deterministic:
+                    action[e, 1:] = dist.mode()
+                else:  # default is deterministic=False.
+                    action[e,
+                    1:] = dist.sample()  # same as above, but 2 means and 2 sigmas for each [e]. The 2 N(m,s) for each [e] are separately determined by the Linear(a_feat[e]).
+                action_log_probs[e] = dist.log_probs(action[e, 1:])
 
         return action, action_log_probs, rnn_hxs
-
 
     def predict_option_termination(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
         value = self.critic_linear(actor_features).squeeze(-1)
 
         terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
-            
+
         next_option = value.argmax(dim=-1)
 
         return value, terminations, next_option.tolist(), rnn_hxs
@@ -231,13 +230,13 @@ class RL_Policy(nn.Module):
         dist_entropy = 0
         for e in range(len(option)):
 
-            if option[e] == 1: #explore: f l r
+            if option[e] == 1:  # explore: f l r
                 dist = self.dist_discrete(actor_features[e])
-                #action_log_probs[e] = dist.log_probs(action[e,0])
+                # action_log_probs[e] = dist.log_probs(action[e,0])
                 action_log_probs[e] = dist.log_probs(action_discrete[e])
-            else: # navigation goal point
+            else:  # navigation goal point
                 dist = self.dist_box(actor_features[e].unsqueeze(0))
-                #action_log_probs[e] = dist.log_probs(action[e,1:])
+                # action_log_probs[e] = dist.log_probs(action[e,1:])
                 action_log_probs[e] = dist.log_probs(action_box[e])
 
             dist_entropy += dist.entropy().mean()
