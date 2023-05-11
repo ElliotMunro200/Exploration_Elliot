@@ -16,7 +16,6 @@ class PPO():
             ppo_epoch,
             num_mini_batch,
             value_loss_coef,
-            termination_loss_coef,
             entropy_coef,
             lr=None,
             eps=None,
@@ -30,7 +29,6 @@ class PPO():
         self.num_mini_batch = num_mini_batch
 
         self.value_loss_coef = value_loss_coef
-        self.termination_loss_coef = termination_loss_coef
         self.entropy_coef = entropy_coef
 
         self.max_grad_norm = max_grad_norm
@@ -46,7 +44,6 @@ class PPO():
                 advantages.std() + 1e-5)
 
         value_loss_epoch = 0
-        termination_loss_epoch = 0
         action_loss_epoch = 0
         dist_entropy_epoch = 0
 
@@ -66,20 +63,12 @@ class PPO():
                 adv_targ = sample['adv_targ']
 
                 # Reshape to do in a single forward pass for all steps
-                values, terminations, action_log_probs, dist_entropy, _ = \
+                values, action_log_probs, dist_entropy, _ = \
                     self.actor_critic.evaluate_actions(
                         sample['obs'], sample['option'], sample['rec_states'], sample['rgb'],
                         sample['masks'], sample['actions_discrete'], sample['actions_box'],
                         extras=sample['extras']
                     )
-                # termination_loss = terminations.gather(1,sample['option'].long().view(-1,1)) * \
-                #                  (values.gather(1,sample['option'].long().view(-1,1)).detach() - values.max(dim=-1)[0].detach().unsqueeze(-1) + 0.01) * \
-                #                  sample['masks'].unsqueeze(-1)
-
-                termination_loss = (terminations.gather(1, sample['option'].long().view(-1, 1)) * \
-                                    (values.gather(1, sample['option'].long().view(-1, 1)).detach() - values.mean(
-                                        dim=-1).detach().unsqueeze(-1)) * \
-                                    sample['masks'].unsqueeze(-1)).mean()
 
                 ratio = torch.exp(action_log_probs - sample['old_action_log_probs'])
 
@@ -90,10 +79,6 @@ class PPO():
 
                 print("action loss:")
                 print(action_loss)
-                print("term loss:")
-                print(termination_loss)
-
-                # action_loss += termination_loss.mul(1).mean()
 
                 if self.use_clipped_value_loss:
                     value_pred_clipped = value_preds.gather(1, sample['option'].long().view(-1, 1)) + \
@@ -110,17 +95,15 @@ class PPO():
                                                 value_losses_clipped).mean()
                 else:
                     value_loss = (returns - values.gather(1, sample['option'].long().view(-1, 1))).pow(2).mean()
-                    # value_loss = 0.5 * (1 - sample['option'].long().view(-1,1) - values.gather(1,sample['option'].long().view(-1,1))).pow(2).mean()
 
                 self.optimizer.zero_grad()
-                (value_loss * self.value_loss_coef + self.termination_loss_coef * termination_loss + action_loss -
+                (value_loss * self.value_loss_coef + action_loss -
                  dist_entropy * self.entropy_coef).backward()
                 nn.utils.clip_grad_norm_(self.actor_critic.parameters(),
                                          self.max_grad_norm)
                 self.optimizer.step()
 
                 value_loss_epoch += value_loss.item()
-                termination_loss_epoch += termination_loss.item()
                 action_loss_epoch += action_loss.item()
                 dist_entropy_epoch += dist_entropy.item()
 
@@ -128,7 +111,6 @@ class PPO():
 
         value_loss_epoch /= num_updates
         action_loss_epoch /= num_updates
-        termination_loss_epoch /= num_updates
         dist_entropy_epoch /= num_updates
 
-        return value_loss_epoch, termination_loss_epoch, action_loss_epoch, dist_entropy_epoch
+        return value_loss_epoch, action_loss_epoch, dist_entropy_epoch

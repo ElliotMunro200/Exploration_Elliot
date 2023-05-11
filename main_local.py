@@ -1,4 +1,3 @@
-import time
 from pytictoc import TicToc
 from collections import deque
 
@@ -9,15 +8,13 @@ import numpy as np
 from torch.distributions import Bernoulli
 import torch
 import torch.nn as nn
-from torch.nn import functional as F
 
 import gym
 import logging
 from arguments_local import get_args
 from env import make_vec_envs
 
-from utils.storage_local import GlobalRolloutStorage  # , FIFOMemory
-# from utils.optimization import get_optimizer
+from utils.storage_local import GlobalRolloutStorage
 
 from algo.ppo_local import PPO
 from model_local import RL_Policy
@@ -57,18 +54,6 @@ def get_frontier_map(map_gt, explored_gt, visited_gt, bad_frontier_map):
     contour = contour & (binary_dilation(bad_frontier_map, morphology.disk(1)) == 0)
     contour = morphology.remove_small_objects(contour, 2)
 
-    '''
-    global counter
-    if counter % 4 == 0:
-        plt.imshow(binary_dilation(visited_gt, morphology.disk(10)))
-        plt.gcf().canvas.flush_events()
-        plt.pause(0.1)
-    counter += 1
-    '''
-
-    map_gt = torch.from_numpy(map_gt).float().to(args.device)
-    explored_gt = torch.from_numpy(explored_gt).float().to(args.device)
-    visited_gt = torch.from_numpy(visited_gt).float().to(args.device)
     return torch.from_numpy(contour.astype(float)).float().to(args.device)
 
 
@@ -119,21 +104,20 @@ def main():
     num_scenes = args.num_processes
     num_episodes = int(args.num_episodes)
     device = args.device = torch.device("cuda:0" if args.cuda else "cpu")
-    policy_loss = 0
 
-    best_cost = 100000
-    costs = deque(maxlen=1000)
-    exp_costs = deque(maxlen=1000)
-    pose_costs = deque(maxlen=1000)
-
-    g_masks = torch.ones(num_scenes).float().to(device)
-
-    best_local_loss = np.inf
     best_g_reward = -np.inf
 
     # plots
     plt.ion()
-    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke")
+    fig, ax = plt.subplots(3, num_scenes+1, figsize=(12, 10), facecolor="whitesmoke")
+    fig.subplots_adjust(hspace=0.5, wspace=0.5, top=0.9, bottom=0.1, left=0.1, right=0.9)
+    fig.suptitle("Metrics by macro")
+    ax[0, 0].set_title("g_values")
+    ax[0, num_scenes].set_title("g_value_losses")
+    ax[1, 0].set_title("current_option")
+    ax[1, num_scenes].set_title("g_dist_entropies")
+    ax[2, 0].set_title("g_rewards")
+    ax[2, num_scenes].set_title("g_action_losses")
     plt.pause(0.001)
 
     if args.eval:
@@ -143,14 +127,8 @@ def main():
 
     g_episode_rewards = deque(maxlen=1000)
     g_value_losses = deque(maxlen=1000)
-    g_termination_losses = deque(maxlen=1000)
     g_action_losses = deque(maxlen=1000)
     g_dist_entropies = deque(maxlen=1000)
-
-    l_episode_rewards = deque(maxlen=1000)
-    l_value_losses = deque(maxlen=1000)
-    l_action_losses = deque(maxlen=1000)
-    l_dist_entropies = deque(maxlen=1000)
 
     per_step_g_rewards = deque(maxlen=1000)
 
@@ -262,7 +240,7 @@ def main():
                                       }).to(device)
 
     g_agent = PPO(g_policy, args.clip_param, args.ppo_epoch,
-                       args.num_mini_batch, args.value_loss_coef, args.termination_loss_coef,
+                       args.num_mini_batch, args.value_loss_coef,
                        args.entropy_coef, lr=args.global_lr, eps=args.eps,
                        max_grad_norm=args.max_grad_norm)
 
@@ -273,7 +251,6 @@ def main():
                                       1).to(device)
 
     # Loading model
-
     if args.load_global != "0":
         print("Loading global {}".format(args.load_global))
         state_dict = torch.load(args.load_global,
@@ -288,7 +265,7 @@ def main():
     # Predict map from frame 1:
     # print(infos.size())
     # print(num_scenes)
-    poses = torch.from_numpy(np.asarray(
+    local_pose = torch.from_numpy(np.asarray( # poses --> local_pose
         [infos[env_idx]['sensor_pose'] for env_idx
          in range(num_scenes)])
     ).float().to(device)
@@ -307,33 +284,21 @@ def main():
         global_orientation[e] = int((locs[e, 2] + 180.0) / 5.)
 
     global_input[:, 0:5, :, :] = local_map.detach()
-    # global_input[:, 4:, :, :] = nn.MaxPool2d(args.global_downscaling)(full_map)
 
     g_rollouts.obs[0].copy_(global_input)
     g_rollouts.rgb[0].copy_(obs)
     g_rollouts.extras[0].copy_(global_orientation)
     g_rollouts.option[0].fill_(1)
 
-    current_option = np.ones((num_scenes, 1))
-    # g_value = torch.zeros(num_scenes,2).to(device)
-    # g_termination = torch.zeros(num_scenes,2).to(device)
-    # g_option = [0 for i in range(num_scenes)]
-    # g_action = torch.zeros(num_scenes,3).to(device)
-    # g_action_log_prob = torch.zeros(num_scenes,1).to(device)
-    # g_rec_states = torch.zeros(num_scenes, g_hidden_size).to(device)
+    current_option = np.zeros((num_scenes, 1))
 
     # Run Policy
-
-    g_value, g_termination, g_option, g_rec_states = \
-        g_policy.predict_option_termination(
+    g_value = g_policy.get_value(
             g_rollouts.obs[0],
-            g_rollouts.option[0],
             g_rollouts.rec_states[0],
             g_rollouts.rgb[0],
             g_rollouts.masks[0],
-            extras=g_rollouts.extras[0],
-            deterministic=False
-        )
+            extras=g_rollouts.extras[0])
 
     g_action, g_action_log_prob, g_rec_states = \
         g_policy.act(
@@ -356,9 +321,7 @@ def main():
 
     for ep_num in range(num_episodes):
 
-        g_reward = torch.from_numpy(np.zeros((num_scenes))).float().to(device)
         g_reward_all = np.zeros((1, num_scenes))
-        # change_goal_flag = [True for i in range(num_scenes)]
         local_step_count = [0 for i in range(num_scenes)]
         local_step_count_rot = [0 for i in range(num_scenes)]
 
@@ -366,21 +329,16 @@ def main():
         global_goals = [[0, 0] for i in range(num_scenes)]
         frontier_goals = [[0, 0] for i in range(num_scenes)]
 
-        g_termination_all1 = [[g_termination[i, 0].cpu().numpy()] for i in range(num_scenes)]
-        g_termination_all2 = [[g_termination[i, 1].cpu().numpy()] for i in range(num_scenes)]
-        g_value_all1 = [[g_value[i, 0].cpu().numpy()] for i in range(num_scenes)]
-        g_value_all2 = [[g_value[i, 1].cpu().numpy()] for i in range(num_scenes)]
+        g_value_all = [[g_value[i].cpu().numpy()] for i in range(num_scenes)]
 
-        current_option_all = [[1] for i in range(num_scenes)]
+        current_option_all = [[0] for i in range(num_scenes)]
 
         for step in range(args.max_episode_length):
             total_num_steps += 1
 
             g_step = (step // args.num_local_steps) % args.num_global_steps
-            eval_g_step = step + 1
-
             # ------------------------------------------------------------------
-            # option RL dicision making
+            # option RL decision making
             # print("local_step_count_rot")
             # print(local_step_count_rot)
             action = np.zeros(num_scenes)
@@ -418,9 +376,6 @@ def main():
                     if local_step_count[e] == 0:  # reset goal point after exploration
                         cpu_actions = nn.Sigmoid()(g_action[e, 1:]).cpu().numpy()
                         global_goals[e] = [int(cpu_actions[0] * (local_w - 1)), int(cpu_actions[1] * (local_h - 1))]
-                        # print("new goal points:")
-                        # print(e)
-                        # print(global_goals[e])
                         change_goal = True
 
                         frontier_map = local_map[e, -1, :, :].detach().cpu().numpy()
@@ -461,8 +416,6 @@ def main():
 
                     action_target = output[e, -1].long().to(device)
                     action[e] = action_target.cpu()
-                    # if output[e,0] == True:
-                    #    local_step_count_nav[e] = 0
 
             print("Timer for phase 2")
             timer.toc()
@@ -493,7 +446,6 @@ def main():
 
             # Update the occupancy and exploration maps
             for env_idx in range(num_scenes):
-                env_obs = obs[env_idx].to("cpu")
                 env_poses = torch.from_numpy(np.asarray(
                     infos[env_idx]['sensor_pose']
                 )).float().to("cpu")
@@ -503,9 +455,6 @@ def main():
                 env_gt_fp_explored = torch.from_numpy(np.asarray(
                     infos[env_idx]['fp_explored']
                 )).unsqueeze(0).float().to("cpu")
-                env_gt_pose_err = torch.from_numpy(np.asarray(
-                    infos[env_idx]['pose_err']
-                )).float().to("cpu")
                 local_map[env_idx, 0, :, :] = env_gt_fp_projs
                 local_map[env_idx, 1, :, :] = env_gt_fp_explored
                 local_pose[env_idx] = env_poses
@@ -527,10 +476,7 @@ def main():
 
             for e in range(num_scenes):
                 current_option_all[e].append(current_option[e, 0].copy())
-                g_termination_all1[e].append(g_termination[e, 0].cpu().numpy().copy())
-                g_termination_all2[e].append(g_termination[e, 1].cpu().numpy().copy())
-                g_value_all1[e].append(g_value[e, 0].cpu().numpy().copy())
-                g_value_all2[e].append(g_value[e, 1].cpu().numpy().copy())
+                g_value_all[e].append(g_value[e].cpu().numpy().copy())
 
             print("Timer for phase 5")
             timer.toc()
@@ -559,8 +505,6 @@ def main():
                                                        bad_frontier_map[e, 0, :, :])
 
                 global_input = local_map
-                # global_input[:, 4:, :, :] = \
-                #    nn.MaxPool2d(args.global_downscaling)(full_map)
 
                 # Get exploration reward and metrics
                 g_reward = torch.from_numpy(np.asarray(
@@ -579,30 +523,24 @@ def main():
                     ax[0, e].clear()
                     ax[1, e].clear()
                     ax[2, e].clear()
-                    ax[3, e].clear()
-                    ax[4, e].clear()
 
-                    ax[0, e].plot(g_termination_all1[e])
-                    ax[0, e].plot(g_termination_all2[e])
-                    ax[1, e].plot(g_value_all1[e])
-                    ax[1, e].plot(g_value_all2[e])
-                    ax[2, e].plot(current_option_all[e])
+                    ax[0, e].plot(g_value_all[e])
+                    ax[1, e].plot(current_option_all[e])
 
                     base = 0.5
                     for i in range(1, len(current_option_all[e]), args.num_local_steps):
 
                         if current_option_all[e][i] == 0:
-                            ax[4, e].axvspan(base, base + 1, facecolor='b', alpha=0.3)
+                            ax[2, e].axvspan(base, base + 1, facecolor='b', alpha=0.3)
                         else:
-                            ax[4, e].axvspan(base, base + 1, facecolor='r', alpha=0.3)
+                            ax[2, e].axvspan(base, base + 1, facecolor='r', alpha=0.3)
                         base += 1
 
-                    ax[4, e].plot(g_reward_all[:, e])
+                    ax[2, e].plot(g_reward_all[:, e])
 
-                ax[3, 0].plot(g_value_losses)
-                ax[3, 1].plot(g_termination_losses)
-                ax[3, 2].plot(g_action_losses)
-                ax[3, 3].plot(g_dist_entropies)
+                ax[0, num_scenes].plot(g_value_losses)
+                ax[1, num_scenes].plot(g_dist_entropies)
+                ax[2, num_scenes].plot(g_action_losses)
 
                 plt.gcf().canvas.flush_events()
                 fig.canvas.start_event_loop(0.001)
@@ -620,27 +558,16 @@ def main():
 
                 g_rollouts.insert(
                     global_input, obs, g_rec_states,
-                    g_action, g_action_log_prob, g_value, current_option, g_termination,
+                    g_action, g_action_log_prob, g_value, current_option,
                     g_reward.detach(), g_masks, global_orientation
                 )
 
-                g_value, g_termination, g_option, g_rec_states = \
-                    g_policy.predict_option_termination(
-                        g_rollouts.obs[g_step + 1],
-                        current_option,
-                        g_rollouts.rec_states[g_step + 1],
-                        g_rollouts.rgb[g_step + 1],
-                        g_rollouts.masks[g_step + 1],
-                        extras=g_rollouts.extras[g_step + 1],
-                        deterministic=False
-                    )
-
-                for e in range(num_scenes):
-                    print("Beta: " + str(e))
-                    print(g_termination[e, current_option[e]])
-                    if bool(Bernoulli(g_termination[e, current_option[e]]).sample().item()):
-                        current_option[e] = np.random.choice(2) if np.random.rand() < g_policy.epsilon() else g_option[
-                            e]
+                g_value = g_policy.get_value(
+                    g_rollouts.obs[0],
+                    g_rollouts.rec_states[0],
+                    g_rollouts.rgb[0],
+                    g_rollouts.masks[0],
+                    extras=g_rollouts.extras[0])
 
                 g_action, g_action_log_prob, g_rec_states = \
                     g_policy.act(
@@ -659,8 +586,6 @@ def main():
                 print("Timer for phase 5")
                 timer.toc()
                 timer.tic()
-                # g_reward = torch.from_numpy(np.zeros((num_scenes))).float().to(device)
-                # g_masks = torch.ones(num_scenes).float().to(device)
                 # ------------------------------------------------------------------
 
                 ### TRAINING
@@ -670,7 +595,7 @@ def main():
                 if g_step % args.num_global_steps == args.num_global_steps - 1:
                     print("#######Training Global Policy#######")
 
-                    g_next_value, g_terminations = g_policy.get_value(
+                    g_next_value = g_policy.get_value(
                         g_rollouts.obs[-1],
                         g_rollouts.rec_states[-1],
                         g_rollouts.rgb[-1],
@@ -678,11 +603,10 @@ def main():
                         extras=g_rollouts.extras[-1]
                     )
 
-                    g_rollouts.compute_returns(args.gamma, g_next_value.detach(), g_terminations.detach())
-                    g_value_loss, g_termination_loss, g_action_loss, g_dist_entropy = \
+                    g_rollouts.compute_returns(args.gamma, g_next_value.detach())
+                    g_value_loss, g_action_loss, g_dist_entropy = \
                         g_agent.update(g_rollouts)
                     g_value_losses.append(g_value_loss * args.value_loss_coef)
-                    g_termination_losses.append(g_termination_loss * args.termination_loss_coef)
                     g_action_losses.append(g_action_loss)
                     g_dist_entropies.append(g_dist_entropy * args.entropy_coef)
                     print("#######Finish Training Global Policy#######")

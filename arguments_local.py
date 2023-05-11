@@ -51,8 +51,8 @@ def get_args():
                         help='path to dump models and log (default: ./tmp/)')
     parser.add_argument('-exp_output', '--exp_output', type=str, default="exp_data/",
                         help='path to dump experiments data')
-    parser.add_argument('--exp_name', type=str, default="exp1",
-                        help='experiment name (default: exp1)')
+    parser.add_argument('--exp_name', type=str, default="exp1_local",
+                        help='experiment name (default: exp1_local)')
     parser.add_argument('--save_periodic', type=int, default=30000,
                         help='Model save frequency in number of updates')
     parser.add_argument('--load_slam', type=str, default="0",
@@ -118,8 +118,6 @@ def get_args():
     parser.add_argument('--entropy_coef', type=float, default=0.001,
                         help='entropy term coefficient (default: 0.001)')
     parser.add_argument('--value_loss_coef', type=float, default=1,
-                        help='value loss coefficient (default: 0.5)')
-    parser.add_argument('--termination_loss_coef', type=float, default=0.5,
                         help='value loss coefficient (default: 0.5)')
     parser.add_argument('--max_grad_norm', type=float, default=0.5,
                         help='max norm of gradients (default: 0.5)')
@@ -251,10 +249,13 @@ def get_args():
 
     assert args.short_goal_dist >= 1, "args.short_goal_dist >= 1"
 
+    args.num_global_steps = args.max_episode_length // args.num_local_steps
+
     if args.use_deterministic_local:
         args.train_local = 0
 
     if args.num_mini_batch == "auto":
+        args.num_envs_per_batch = min(2, args.num_processes)
         args.num_mini_batch = args.num_processes // args.num_envs_per_batch
     else:
         args.num_mini_batch = int(args.num_mini_batch)

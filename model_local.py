@@ -147,14 +147,13 @@ class RL_Policy(nn.Module):
             raise NotImplementedError
 
         num_outputs = action_space_discrete.n
-        # self.dist_discrete = Categorical(self.network.output_size, num_outputs)
-        self.dist_discrete = DiagGaussian(self.network.output_size, 1)  # (256,1) size Linear
+        self.dist_discrete = Categorical(self.network.output_size, num_outputs)
+        #self.dist_discrete = DiagGaussian(self.network.output_size, 1)  # (256,1) size Linear
 
         num_outputs = action_space_box.shape[0]
-        self.dist_box = DiagGaussian(self.network.output_size, num_outputs)  # (256,2) size Linear
+        self.dist_box = DiagGaussian(self.network.output_size, num_outputs) # (256,1) size Linear
 
-        self.critic_linear = nn.Linear(256, 2)  # value
-        self.terminations = nn.Linear(256, 2)  # termination probabilty
+        self.critic_linear = nn.Linear(256, 1)  # value
         self.model_type = model_type
         self.num_steps = 0
         self.device = device
@@ -203,28 +202,16 @@ class RL_Policy(nn.Module):
 
         return action, action_log_probs, rnn_hxs
 
-    def predict_option_termination(self, inputs, option, rnn_hxs, rgb, masks, extras=None, deterministic=False):
-        actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
-        value = self.critic_linear(actor_features).squeeze(-1)
-
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
-
-        next_option = value.argmax(dim=-1)
-
-        return value, terminations, next_option.tolist(), rnn_hxs
-
     def get_value(self, inputs, rnn_hxs, rgb, masks, extras=None):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
         value = self.critic_linear(actor_features).squeeze(-1)
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
 
-        return value, terminations
+        return value
 
     def evaluate_actions(self, inputs, option, rnn_hxs, rgb, masks, action_discrete, action_box, extras=None):
 
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
         value = self.critic_linear(actor_features).squeeze(-1)
-        terminations = self.terminations(actor_features).sigmoid().squeeze(-1)
 
         action_log_probs = torch.zeros(len(option)).to(self.device)
         dist_entropy = 0
@@ -241,7 +228,7 @@ class RL_Policy(nn.Module):
 
             dist_entropy += dist.entropy().mean()
 
-        return value, terminations, action_log_probs, dist_entropy, rnn_hxs
+        return value, action_log_probs, dist_entropy, rnn_hxs
 
     def epsilon(self):
         eps = 0.1 + (1.0 - 0.1) * exp(-self.num_steps / 20000)

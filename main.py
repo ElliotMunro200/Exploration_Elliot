@@ -133,9 +133,19 @@ def main():
     best_local_loss = np.inf
     best_g_reward = -np.inf
 
-    #plots
+    # plots
     plt.ion()
-    fig, ax = plt.subplots(5, num_scenes, figsize=(10, 2.5), facecolor="whitesmoke")
+    fig, ax = plt.subplots(4, num_scenes + 1, figsize=(12, 10), facecolor="whitesmoke")
+    fig.subplots_adjust(hspace=0.5, wspace=0.5, top=0.9, bottom=0.1, left=0.1, right=0.9)
+    fig.suptitle("Metrics by macro")
+    ax[0, 0].set_title("g_terminations")
+    ax[0, num_scenes].set_title("g_termination_losses")
+    ax[1, 0].set_title("g_values")
+    ax[1, num_scenes].set_title("g_value_losses")
+    ax[2, 0].set_title("current_option")
+    ax[2, num_scenes].set_title("g_dist_entropies")
+    ax[3, 0].set_title("g_rewards")
+    ax[3, num_scenes].set_title("g_action_losses")
     plt.pause(0.001)
 
     if args.eval:
@@ -583,42 +593,39 @@ def main():
 
                 g_reward_all = np.concatenate((g_reward_all, np.expand_dims(g_reward.cpu().numpy(), axis=0)), axis=0)
 
-                #Plot curves
+                # Plot curves
                 for e in range(num_scenes):
 
-                    ax[0,e].clear()
-                    ax[1,e].clear()
-                    ax[2,e].clear()
-                    ax[3,e].clear()
-                    ax[4,e].clear()
+                    ax[0, e].clear()
+                    ax[1, e].clear()
+                    ax[2, e].clear()
+                    ax[3, e].clear()
 
-                    
-                    ax[0,e].plot(g_termination_all1[e])
-                    ax[0,e].plot(g_termination_all2[e])
-                    ax[1,e].plot(g_value_all1[e])
-                    ax[1,e].plot(g_value_all2[e])
-                    ax[2,e].plot(current_option_all[e])
+                    ax[0, e].plot(g_termination_all1[e])
+                    ax[0, e].plot(g_termination_all2[e])
+                    ax[1, e].plot(g_value_all1[e])
+                    ax[1, e].plot(g_value_all2[e])
+                    ax[2, e].plot(current_option_all[e])
 
                     base = 0.5
-                    for i in range(1,len(current_option_all[e]),args.num_local_steps):
-                        
+                    for i in range(1, len(current_option_all[e]), args.num_local_steps):
+
                         if current_option_all[e][i] == 0:
-                            ax[4,e].axvspan(base, base+1, facecolor='b', alpha=0.3)
+                            ax[3, e].axvspan(base, base + 1, facecolor='b', alpha=0.3)
                         else:
-                            ax[4,e].axvspan(base, base+1, facecolor='r', alpha=0.3)
+                            ax[3, e].axvspan(base, base + 1, facecolor='r', alpha=0.3)
                         base += 1
 
-                    ax[4,e].plot(g_reward_all[:,e])
+                    ax[3, e].plot(g_reward_all[:, e])
 
-                ax[3,0].plot(g_value_losses)
-                ax[3,1].plot(g_termination_losses)
-                ax[3,2].plot(g_action_losses)
-                ax[3,3].plot(g_dist_entropies)
+                ax[0, num_scenes].plot(g_termination_losses)
+                ax[1, num_scenes].plot(g_value_losses)
+                ax[2, num_scenes].plot(g_dist_entropies)
+                ax[3, num_scenes].plot(g_action_losses)
 
                 plt.gcf().canvas.flush_events()
                 fig.canvas.start_event_loop(0.001)
                 plt.pause(0.001)
-
 
                 g_process_rewards += g_reward.cpu().numpy()
                 g_total_rewards = g_process_rewards * \
