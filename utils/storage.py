@@ -94,7 +94,7 @@ class RolloutStorage(object):
             self.extras[0].copy_(self.extras[-1])
 
     def compute_returns(self, gamma, next_value, next_terminations):
-        #collect rewards of path-planning steps
+        # computing returns=discounted_rewards-to-go over the macros.
         for e in range(self.num_processes):
             self.returns[-1,e] = ((1-next_terminations[e,int(self.option[-1,e])].detach()) * \
                                   next_value[e,int(self.option[-1,e])].detach() + \

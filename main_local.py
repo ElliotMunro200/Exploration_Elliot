@@ -559,26 +559,23 @@ def main():
                 g_rollouts.insert(
                     global_input, obs, g_rec_states,
                     g_action, g_action_log_prob, g_value, current_option,
-                    g_reward.detach(), g_masks, global_orientation
-                )
+                    g_reward.detach(), g_masks, global_orientation)
 
                 g_value = g_policy.get_value(
-                    g_rollouts.obs[0],
-                    g_rollouts.rec_states[0],
-                    g_rollouts.rgb[0],
-                    g_rollouts.masks[0],
-                    extras=g_rollouts.extras[0])
+                    g_rollouts.obs[g_step + 1],
+                    g_rollouts.rec_states[g_step + 1],
+                    g_rollouts.rgb[g_step + 1],
+                    g_rollouts.masks[g_step + 1],
+                    extras=g_rollouts.extras[g_step + 1])
 
-                g_action, g_action_log_prob, g_rec_states = \
-                    g_policy.act(
-                        g_rollouts.obs[g_step + 1],
-                        current_option,
-                        g_rollouts.rec_states[g_step + 1],
-                        g_rollouts.rgb[g_step + 1],
-                        g_rollouts.masks[g_step + 1],
-                        extras=g_rollouts.extras[g_step + 1],
-                        deterministic=False
-                    )
+                g_action, g_action_log_prob, g_rec_states = g_policy.act(
+                    g_rollouts.obs[g_step + 1],
+                    current_option,
+                    g_rollouts.rec_states[g_step + 1],
+                    g_rollouts.rgb[g_step + 1],
+                    g_rollouts.masks[g_step + 1],
+                    extras=g_rollouts.extras[g_step + 1],
+                    deterministic=False)
 
                 print("g_value")
                 print(g_value)
@@ -604,11 +601,13 @@ def main():
                     )
 
                     g_rollouts.compute_returns(args.gamma, g_next_value.detach())
-                    g_value_loss, g_action_loss, g_dist_entropy = \
-                        g_agent.update(g_rollouts)
+
+                    g_value_loss, g_action_loss, g_dist_entropy = g_agent.update(g_rollouts)
+
                     g_value_losses.append(g_value_loss * args.value_loss_coef)
                     g_action_losses.append(g_action_loss)
                     g_dist_entropies.append(g_dist_entropy * args.entropy_coef)
+
                     print("#######Finish Training Global Policy#######")
                     g_rollouts.after_update()
                 # ------------------------------------------------------------------

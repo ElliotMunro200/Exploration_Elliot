@@ -91,13 +91,12 @@ class RolloutStorage(object):
             self.extras[0].copy_(self.extras[-1])
 
     def compute_returns(self, gamma, next_value):
-        # collect rewards of path-planning steps
+        # computing returns=discounted_rewards-to-go over the actions.
         for e in range(self.num_processes):
-            self.returns[-1, e] = (next_value[e, int(self.option[-1, e])].detach() + next_value[e].max(dim=-1)[0].detach())
+            self.returns[-1, e] = (next_value[e].detach())
 
         for step in reversed(range(self.rewards.size(0))):
-            self.returns[step] = self.returns[step + 1] * gamma \
-                                 * self.masks[step + 1] + self.rewards[step]
+            self.returns[step] = self.returns[step + 1] * gamma * self.masks[step + 1] + self.rewards[step]
 
     def feed_forward_generator(self, advantages, num_mini_batch):
 
