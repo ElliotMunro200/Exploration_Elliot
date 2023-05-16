@@ -81,7 +81,7 @@ def get_args():
                         help='Frame width (default:84)')
     parser.add_argument('-fh', '--frame_height', type=int, default=128,
                         help='Frame height (default:84)')
-    parser.add_argument('-el', '--max_episode_length', type=int, default=1000,
+    parser.add_argument('-el', '--max_episode_length', type=int, default=25,
                         help="""Maximum episode length in seconds for
                                 Doom (default: 180)""")
     parser.add_argument("--sim_gpu_id", type=int, default=1,
