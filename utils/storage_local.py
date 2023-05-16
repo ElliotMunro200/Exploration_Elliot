@@ -66,13 +66,9 @@ class RolloutStorage(object):
         self.obs[self.step + 1].copy_(obs)
         self.rgb[self.step + 1].copy_(rgb)
         self.rec_states[self.step + 1].copy_(rec_states)
-
         for e in range(len(option)):
-            if option[e] == 1:  # rotate
-                self.actions_discrete[self.step, e].copy_(actions[e, 0].view(-1))
-            else:
-                self.actions_box[self.step, e].copy_(actions[e, 1:].view(-1))
-
+            assert option[e] == 0  # navigate
+            self.actions_box[self.step, e].copy_(actions[e, 0].view(-1))
         self.action_log_probs[self.step].copy_(action_log_probs)
         self.value_preds[self.step].copy_(value_preds)
         self.option[self.step].copy_(torch.from_numpy(option).view(-1))

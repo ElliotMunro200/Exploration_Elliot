@@ -74,7 +74,7 @@ class Global_Policy(NNBase):
         if self.is_recurrent:
             x, rnn_hxs = self._forward_gru(x, rnn_hxs, masks)
         # (512) --> (256)
-        x = nn.ReLU()(self.linear2(x))
+        x = nn.Tanh()(self.linear2(x))
 
         # actor_features = (256), rec_state = (512)
         return x, rnn_hxs
@@ -179,26 +179,20 @@ class RL_Policy(nn.Module):
         actor_features, rnn_hxs = self(inputs, rnn_hxs, rgb, masks, extras)
 
         action_log_probs = torch.zeros(len(option)).to(self.device)
-        action = torch.zeros(len(option), 3).to(self.device)
+        action = torch.zeros(len(option), 1).to(self.device)
 
         for e in range(len(option)):
-
-            if option[e] == 1:  # rotate, explore: f l r ?
-                dist = self.dist_discrete(actor_features[e])  # FixedNormal distribution
-                if deterministic:
-                    action[e, 0] = dist.mode()
-                else:  # default is deterministic=False.
-                    action[
-                        e, 0] = dist.sample()  # sampling from Normal dist Linear(actor_features[e]) --> mean[e] . N(mean[e],sigma).sample().
-                action_log_probs[e] = dist.log_probs(action[e, 0])
-            else:  # navigation goal point
-                dist = self.dist_box(actor_features[e].unsqueeze(0))
-                if deterministic:
-                    action[e, 1:] = dist.mode()
-                else:  # default is deterministic=False.
-                    action[e,
-                    1:] = dist.sample()  # same as above, but 2 means and 2 sigmas for each [e]. The 2 N(m,s) for each [e] are separately determined by the Linear(a_feat[e]).
-                action_log_probs[e] = dist.log_probs(action[e, 1:])
+            # navigate
+            assert option[e] == 0
+            #logits = torch.tanh()
+            dist = self.dist_discrete(actor_features[e])  # FixedNormal distribution
+            if deterministic:
+                action[e, 0] = dist.mode()
+            # default is deterministic=False.
+            # sampling from Normal dist Linear(actor_features[e]) --> mean[e]. N(mean[e],sigma).sample().
+            else:
+                action[e, 0] = dist.sample()
+            action_log_probs[e] = dist.log_probs(action[e, 0])
 
         return action, action_log_probs, rnn_hxs
 
@@ -216,16 +210,9 @@ class RL_Policy(nn.Module):
         action_log_probs = torch.zeros(len(option)).to(self.device)
         dist_entropy = 0
         for e in range(len(option)):
-
-            if option[e] == 1:  # explore: f l r
-                dist = self.dist_discrete(actor_features[e])
-                # action_log_probs[e] = dist.log_probs(action[e,0])
-                action_log_probs[e] = dist.log_probs(action_discrete[e])
-            else:  # navigation goal point
-                dist = self.dist_box(actor_features[e].unsqueeze(0))
-                # action_log_probs[e] = dist.log_probs(action[e,1:])
-                action_log_probs[e] = dist.log_probs(action_box[e])
-
+            assert option[e] == 0  # explore: f l r
+            dist = self.dist_discrete(actor_features[e])
+            action_log_probs[e] = dist.log_probs(action_discrete[e])
             dist_entropy += dist.entropy().mean()
 
         return value, action_log_probs, dist_entropy, rnn_hxs

@@ -215,21 +215,19 @@ def main():
                                             local_h), dtype='uint8')
 
     # Policy action space
-    g_action_space = gym.spaces.Box(low=0.0, high=1.0,
-                                    shape=(2,), dtype=np.float32)
+    g_action_space = gym.spaces.Box(low=0.0, high=1.0, shape=(1,), dtype=np.float32)
 
     # RGB observation space
-    rgb_observation_space = gym.spaces.Box(0, 255,
-                                           (3,
-                                            args.frame_width,
-                                            args.frame_width), dtype='uint8')
+    rgb_observation_space = gym.spaces.Box(0, 255, (3, args.frame_width, args.frame_width), dtype='uint8')
 
     # Global policy recurrent layer sizes
     l_hidden_size = args.local_hidden_size  # visual encoder hidden vector
     g_hidden_size = args.global_hidden_size  # global feature hidden vector
 
     # Global policy (option RL)
-    g_policy = RL_Policy(map_observation_space.shape, envs.venv.action_space, g_action_space,
+    g_policy = RL_Policy(map_observation_space.shape,
+                         envs.venv.action_space,
+                         g_action_space,
                          rgb_observation_space.shape,
                          hidden_size=l_hidden_size,
                          use_deterministic_local=args.use_deterministic_local,
@@ -245,8 +243,7 @@ def main():
                        max_grad_norm=args.max_grad_norm)
 
     # Storage
-    g_rollouts = GlobalRolloutStorage(args.num_global_steps,
-                                      num_scenes, map_observation_space.shape,
+    g_rollouts = GlobalRolloutStorage(args.num_global_steps, num_scenes, map_observation_space.shape,
                                       g_action_space, g_policy.rec_state_size, rgb_observation_space.shape,
                                       1).to(device)
 
@@ -288,7 +285,7 @@ def main():
     g_rollouts.obs[0].copy_(global_input)
     g_rollouts.rgb[0].copy_(obs)
     g_rollouts.extras[0].copy_(global_orientation)
-    g_rollouts.option[0].fill_(1)
+    g_rollouts.option[0].fill_(0)
 
     current_option = np.zeros((num_scenes, 1))
 
@@ -315,19 +312,15 @@ def main():
 
     total_num_steps = -1
 
-    print("Timer for phase 1")
+    print(f"Timer for phase 1:")
     timer.toc()
     timer.tic()
 
     for ep_num in range(num_episodes):
 
         g_reward_all = np.zeros((1, num_scenes))
-        local_step_count = [0 for i in range(num_scenes)]
-        local_step_count_rot = [0 for i in range(num_scenes)]
 
         torch.set_grad_enabled(False)
-        global_goals = [[0, 0] for i in range(num_scenes)]
-        frontier_goals = [[0, 0] for i in range(num_scenes)]
 
         g_value_all = [[g_value[i].cpu().numpy()] for i in range(num_scenes)]
 
@@ -335,89 +328,13 @@ def main():
 
         for step in range(args.max_episode_length):
             total_num_steps += 1
-
             g_step = (step // args.num_local_steps) % args.num_global_steps
             # ------------------------------------------------------------------
-            # option RL decision making
-            # print("local_step_count_rot")
-            # print(local_step_count_rot)
-            action = np.zeros(num_scenes)
-            for e in range(num_scenes):
-                change_goal = False
-                if current_option[e] == 1:  # rotate
-                    if local_step_count[e] == 0:  # reset rotation degree
-                        cpu_actions = nn.Tanh()(g_action[e, 0]).cpu().numpy()
-                        local_step_count_rot[e] = int(cpu_actions * 180 / 10)
-                        local_step_count[e] = args.num_local_steps
+            # action selection
+            action = np.array(g_action)
+            print(f"G_ACTION: {g_action}")
 
-                    if local_step_count_rot[e] == 1 and local_step_count[e] > 1:
-                        local_step_count_rot[e] -= 2
-                        action[e] = 1
-                    elif local_step_count_rot[e] > 1 and local_step_count[e] > 1:
-                        local_step_count_rot[e] -= 1
-                        action[e] = 1
-                    elif local_step_count_rot[e] == 1 and local_step_count[e] == 1:
-                        local_step_count_rot[e] -= 1
-                        action[e] = 1
-
-                    elif local_step_count_rot[e] == -1 and local_step_count[e] > 1:
-                        local_step_count_rot[e] += 2
-                        action[e] = 0
-                    elif local_step_count_rot[e] < -1 and local_step_count[e] > 1:
-                        local_step_count_rot[e] += 1
-                        action[e] = 0
-                    elif local_step_count_rot[e] == -1 and local_step_count[e] == 1:
-                        local_step_count_rot[e] += 1
-                        action[e] = 0
-
-                    local_step_count[e] -= 1
-
-                else:  # navigation
-                    if local_step_count[e] == 0:  # reset goal point after exploration
-                        cpu_actions = nn.Sigmoid()(g_action[e, 1:]).cpu().numpy()
-                        global_goals[e] = [int(cpu_actions[0] * (local_w - 1)), int(cpu_actions[1] * (local_h - 1))]
-                        change_goal = True
-
-                        frontier_map = local_map[e, -1, :, :].detach().cpu().numpy()
-                        ind_r, ind_c = np.nonzero(frontier_map)
-                        if ind_r.size == 0 or ind_c.size == 0:
-                            ind_r, ind_c = np.array([int(planner_pose_inputs[e, 1] * 100.0 / args.map_resolution)]), \
-                                np.array([int(planner_pose_inputs[e, 0] * 100.0 / args.map_resolution)])
-                        ind = np.stack((ind_r, ind_c), 1)
-                        dist = ind - np.array(global_goals[e])
-                        dist = dist ** 2
-                        dist = np.sum(dist, 1)
-                        f_ind = np.argmin(dist)
-                        frontier_goals[e] = [ind_r[f_ind], ind_c[f_ind]]
-                        print("new frontier points for " + str(e))
-                        print((ind_r[f_ind], ind_c[f_ind]))
-                        bad_frontier_map[e, 0, ind_r[f_ind], ind_c[f_ind]] = 1
-                        local_step_count[e] = args.num_local_steps
-
-                    local_step_count[e] -= 1
-
-                    # print('local remaining steps')
-                    # print(local_step_count[e])
-
-                    # global_goals[e] = global_goals[e][0]
-
-                    # Get short term goal
-                    planner_inputs = [{} for en in range(num_scenes)]
-                    for en, p_input in enumerate(planner_inputs):
-                        p_input['map_pred'] = local_map[en, 0, :, :].cpu().numpy()
-                        p_input['exp_pred'] = local_map[en, 1, :, :].cpu().numpy()
-                        p_input['pose_pred'] = planner_pose_inputs[en]
-                        p_input['goal'] = global_goals[e]  # frontier_goals[e]
-                        p_input['goal_arbitrary'] = global_goals[e]
-                        p_input['change_goal'] = change_goal
-                        p_input['active'] = True if en == e else False
-
-                    output = envs.get_short_term_goal(planner_inputs)
-
-                    action_target = output[e, -1].long().to(device)
-                    action[e] = action_target.cpu()
-
-            print("Timer for phase 2")
+            print(f"Timer for phase 2:")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
@@ -434,7 +351,7 @@ def main():
 
             envs.update_visualize(current_option)
 
-            print("Timer for phase 3")
+            print(f"Timer for phase 3:")
             timer.toc()
             timer.tic()
 
@@ -470,7 +387,7 @@ def main():
                 local_map[e, 2:4, loc_r - 2:loc_r + 3, loc_c - 2:loc_c + 3] = 1.
 
             # ------------------------------------------------------------------
-            print("Timer for phase 4")
+            print(f"Timer for phase 4:")
             timer.toc()
             timer.tic()
 
@@ -478,22 +395,11 @@ def main():
                 current_option_all[e].append(current_option[e, 0].copy())
                 g_value_all[e].append(g_value[e].cpu().numpy().copy())
 
-            print("Timer for phase 5")
+            print(f"Timer for phase 5:")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
-
-            # Add samples to global policy storage
-
-            print("local step count")
-            print(local_step_count)
-
-            # Sample action from global policy
             local_done = True
-            for e in range(num_scenes):
-                if local_step_count[e] > 0:
-                    local_done = False
-
             if local_done:  # Global step
 
                 # Update frontier map
@@ -506,15 +412,9 @@ def main():
 
                 global_input = local_map
 
-                # Get exploration reward and metrics
-                g_reward = torch.from_numpy(np.asarray(
-                    [infos[env_idx]['exp_reward'] for env_idx
-                     in range(num_scenes)])
-                ).float().to(device)
-
-                print("Rewards:")
-                print(g_reward)
-
+                # Get reward from infos
+                g_reward = torch.from_numpy(np.array([infos[env_idx]['exp_reward'] for env_idx in range(num_scenes)], dtype=np.float64)).float().to(device)
+                print(f"Rewards: {g_reward}")
                 g_reward_all = np.concatenate((g_reward_all, np.expand_dims(g_reward.cpu().numpy(), axis=0)), axis=0)
 
                 # Plot curves
@@ -577,11 +477,9 @@ def main():
                     extras=g_rollouts.extras[g_step + 1],
                     deterministic=False)
 
-                print("g_value")
-                print(g_value)
+                print(f"g_value: {g_value}")
 
-                print("Timer for phase 5")
-                timer.toc()
+                print(f"Timer for phase 5: {timer.toc()}")
                 timer.tic()
                 # ------------------------------------------------------------------
 
@@ -589,8 +487,9 @@ def main():
                 torch.set_grad_enabled(True)
 
                 # Train Global Policy
-                if g_step % args.num_global_steps == args.num_global_steps - 1:
+                if (g_step % args.num_global_steps) == (args.num_global_steps - 1):
                     print("#######Training Global Policy#######")
+                    print(f"G_STEP: {g_step}")
 
                     g_next_value = g_policy.get_value(
                         g_rollouts.obs[-1],

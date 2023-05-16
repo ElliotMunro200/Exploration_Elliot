@@ -121,7 +121,7 @@ def get_args():
                         help='value loss coefficient (default: 0.5)')
     parser.add_argument('--max_grad_norm', type=float, default=0.5,
                         help='max norm of gradients (default: 0.5)')
-    parser.add_argument('--num_global_steps', type=int, default=40,#20
+    parser.add_argument('--num_global_steps', type=int, default=25,#20
                         help='number of forward steps in A2C (default: 5)')
     parser.add_argument('--ppo_epoch', type=int, default=4,
                         help='number of ppo epochs (default: 4)')
@@ -137,7 +137,7 @@ def get_args():
     # Visual Encoder
     parser.add_argument('--visual_optimizer', type=str,
                         default='adam,lr=0.0001')
-    parser.add_argument('--num_local_steps', type=int, default=25, #50
+    parser.add_argument('--num_local_steps', type=int, default=1, #50
                         help="""Number of steps the local can
                             perform between each global instruction""")
     parser.add_argument('--local_hidden_size', type=int, default=512,

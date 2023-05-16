@@ -319,15 +319,13 @@ class Exploration_Env(habitat.RLEnv):
                                     self.collison_map.shape)
                         self.collison_map[r,c] = 1
 
-        self.visited_count[self.new_explored==1] += 1 
+        self.visited_count[self.new_explored == 1] += 1
 
         # Set info
         self.info['time'] = self.timestep
         self.info['fp_proj'] = self.map, # occupancy map
         self.info['fp_explored']= self.explored_map, # explored map
-        self.info['sensor_pose'] = [self.curr_loc_gt[0],
-                                    self.curr_loc_gt[1],
-                                    np.deg2rad(self.curr_loc_gt[2])]
+        self.info['sensor_pose'] = [self.curr_loc_gt[0], self.curr_loc_gt[1], np.deg2rad(self.curr_loc_gt[2])]
 
 
         if self.timestep % args.num_local_steps == 0:
