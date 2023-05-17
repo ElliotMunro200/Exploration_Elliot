@@ -331,7 +331,7 @@ def main():
             g_step = (step // args.num_local_steps) % args.num_global_steps
             # ------------------------------------------------------------------
             # action selection
-            action = np.array(g_action)
+            action = np.array(g_action.cpu())
             print(f"G_ACTION: {g_action}")
 
             print(f"Timer for phase 2:")

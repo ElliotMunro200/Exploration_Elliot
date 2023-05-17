@@ -29,7 +29,7 @@ class RolloutStorage(object):
         self.rec_states = torch.zeros(num_steps + 1, num_processes,
                                       rec_state_size)
         self.rewards = torch.zeros(num_steps, num_processes)
-        self.value_preds = torch.zeros(num_steps + 1, num_processes, 2)
+        self.value_preds = torch.zeros(num_steps + 1, num_processes)
         self.returns = torch.zeros(num_steps + 1, num_processes)
         self.option = torch.zeros(num_steps + 1, num_processes)
         self.is_intermediate = torch.zeros(num_steps + 1, num_processes)
@@ -129,7 +129,7 @@ class RolloutStorage(object):
     def recurrent_generator(self, advantages, num_mini_batch):
 
         num_processes = self.rewards.size(1)  # 4
-        assert num_processes >= num_mini_batch, (  # 4 >= 2 is True
+        assert num_processes >= num_mini_batch, (  # 4 >= 2 is True (or 1=1)
             "PPO requires the number of processes ({}) "
             "to be greater than or equal to the number of "
             "PPO mini batches ({}).".format(num_processes, num_mini_batch))
