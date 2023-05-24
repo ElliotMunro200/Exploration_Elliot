@@ -34,6 +34,20 @@ matplotlib.use('tkagg')
 
 args = get_args()
 
+if args.wandb:
+    import wandb
+
+    run_name = f"{args.task_config}__{args.split}__{args.exp_name}__{args.seed}__{int(time.time())}"
+    wandb.init(
+        project=args.wandb_project_name,
+        entity=args.wandb_entity,
+        sync_tensorboard=True,
+        config=vars(args),
+        name=run_name,
+        monitor_gym=True,
+        save_code=True,
+    )
+
 np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 
@@ -312,7 +326,7 @@ def main():
 
     total_num_steps = -1
 
-    print(f"Timer for phase 1:")
+    print(f"Timer for phase 1 (set up):")
     timer.toc()
     timer.tic()
 
@@ -334,7 +348,7 @@ def main():
             action = np.array(g_action.cpu())
             print(f"G_ACTION: {g_action}")
 
-            print(f"Timer for phase 2:")
+            print(f"Timer for phase 2 (small variables):")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
@@ -351,7 +365,7 @@ def main():
 
             envs.update_visualize(current_option)
 
-            print(f"Timer for phase 3:")
+            print(f"Timer for phase 3 (env.step):")
             timer.toc()
             timer.tic()
 
@@ -387,7 +401,7 @@ def main():
                 local_map[e, 2:4, loc_r - 2:loc_r + 3, loc_c - 2:loc_c + 3] = 1.
 
             # ------------------------------------------------------------------
-            print(f"Timer for phase 4:")
+            print(f"Timer for phase 4 (get data from habitat envs):")
             timer.toc()
             timer.tic()
 
@@ -395,12 +409,12 @@ def main():
                 current_option_all[e].append(current_option[e, 0].copy())
                 g_value_all[e].append(g_value[e].cpu().numpy().copy())
 
-            print(f"Timer for phase 5:")
+            print(f"Timer for phase 5 (small variables):")
             timer.toc()
             timer.tic()
             # ------------------------------------------------------------------
             local_done = True
-            if local_done:  # Global step
+            if local_done:
 
                 # Update frontier map
                 locs = local_pose.cpu().numpy()
@@ -417,34 +431,42 @@ def main():
                 print(f"Rewards: {g_reward}")
                 g_reward_all = np.concatenate((g_reward_all, np.expand_dims(g_reward.cpu().numpy(), axis=0)), axis=0)
 
-                # Plot curves
-                for e in range(num_scenes):
+                print(f"Timer for phase 6a (updating frontier map, getting reward from habitat scene):")
+                timer.toc()
+                timer.tic()
 
-                    ax[0, e].clear()
-                    ax[1, e].clear()
-                    ax[2, e].clear()
+                # # Plot curves
+                # for e in range(num_scenes):
+                #
+                #     ax[0, e].clear()
+                #     ax[1, e].clear()
+                #     ax[2, e].clear()
+                #
+                #     ax[0, e].plot(g_value_all[e])
+                #     ax[1, e].plot(current_option_all[e])
+                #
+                #     base = 0.5
+                #     for i in range(1, len(current_option_all[e]), args.num_local_steps):
+                #
+                #         if current_option_all[e][i] == 0:
+                #             ax[2, e].axvspan(base, base + 1, facecolor='b', alpha=0.3)
+                #         else:
+                #             ax[2, e].axvspan(base, base + 1, facecolor='r', alpha=0.3)
+                #         base += 1
+                #
+                #     ax[2, e].plot(g_reward_all[:, e])
+                #
+                # ax[0, num_scenes].plot(g_value_losses)
+                # ax[1, num_scenes].plot(g_dist_entropies)
+                # ax[2, num_scenes].plot(g_action_losses)
+                #
+                # plt.gcf().canvas.flush_events()
+                # fig.canvas.start_event_loop(0.001)
+                # plt.pause(0.001)
 
-                    ax[0, e].plot(g_value_all[e])
-                    ax[1, e].plot(current_option_all[e])
-
-                    base = 0.5
-                    for i in range(1, len(current_option_all[e]), args.num_local_steps):
-
-                        if current_option_all[e][i] == 0:
-                            ax[2, e].axvspan(base, base + 1, facecolor='b', alpha=0.3)
-                        else:
-                            ax[2, e].axvspan(base, base + 1, facecolor='r', alpha=0.3)
-                        base += 1
-
-                    ax[2, e].plot(g_reward_all[:, e])
-
-                ax[0, num_scenes].plot(g_value_losses)
-                ax[1, num_scenes].plot(g_dist_entropies)
-                ax[2, num_scenes].plot(g_action_losses)
-
-                plt.gcf().canvas.flush_events()
-                fig.canvas.start_event_loop(0.001)
-                plt.pause(0.001)
+                print(f"Timer for phase 6b (update plots):")
+                timer.toc()
+                timer.tic()
 
                 g_process_rewards += g_reward.cpu().numpy()
                 g_total_rewards = g_process_rewards * \
@@ -456,10 +478,18 @@ def main():
                     for tr in g_total_rewards:
                         g_episode_rewards.append(tr) if tr != 0 else None
 
+                print(f"Timer for phase 6c (process rewards):")
+                timer.toc()
+                timer.tic()
+
                 g_rollouts.insert(
                     global_input, obs, g_rec_states,
                     g_action, g_action_log_prob, g_value, current_option,
                     g_reward.detach(), g_masks, global_orientation)
+
+                print(f"Timer for phase 6d (add buffer):")
+                timer.toc()
+                timer.tic()
 
                 g_value = g_policy.get_value(
                     g_rollouts.obs[g_step + 1],
@@ -479,7 +509,8 @@ def main():
 
                 print(f"g_value: {g_value}")
 
-                print(f"Timer for phase 5: {timer.toc()}")
+                print(f"Timer for phase 6e (get value, get action):")
+                timer.toc()
                 timer.tic()
                 # ------------------------------------------------------------------
 
@@ -514,7 +545,9 @@ def main():
                 # Finish Training
                 torch.set_grad_enabled(False)
             # ------------------------------------------------------------------
-
+                print(f"Timer for phase 7 (training):")
+                timer.toc()
+                timer.tic()
             # ------------------------------------------------------------------
             # Logging
             if total_num_steps % args.log_interval == 0:
@@ -583,8 +616,11 @@ def main():
                                os.path.join(dump_dir,
                                             "periodic_{}.global".format(step)))
             # ------------------------------------------------------------------
-
-    # Print and save model performance numbers during evaluation
+            print(f"Timer for phase 8 (logging, printing, model saving):")
+            timer.toc()
+            timer.tic()
+            # ------------------------------------------------------------------
+    # After training loop, save
     if args.eval:
         logfile = open("{}/explored_area.txt".format(dump_dir), "w+")
         for e in range(num_scenes):
@@ -614,6 +650,8 @@ def main():
 
         print(log)
         logging.info(log)
+        print(f"Timer for phase 9 (saving logs of explored area if evaluating):")
+        timer.toc()
 
 
 if __name__ == "__main__":

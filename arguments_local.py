@@ -6,7 +6,7 @@ import torch
 def get_args():
     parser = argparse.ArgumentParser(description='Active-Neural-SLAM')
 
-    ## General Arguments
+    # General Arguments
     parser.add_argument('--seed', type=int, default=1,
                         help='random seed (default: 1)')
     parser.add_argument('--auto_gpu_config', type=int, default=0)
@@ -42,6 +42,10 @@ def get_args():
     parser.add_argument('--local_explore_width', type=int, default=64)
 
     # Logging, loading models, visualization
+    parser.add_argument('-w', '--wandb', action='store_true', default=False,
+                        help='enables WandB experiment tracking and logging')
+    parser.add_argument('-g', '--git_hash', type=str, default=None,
+                        help="the git hash for the code associated with the wandb experiment.")
     parser.add_argument('--log_interval', type=int, default=10,
                         help="""log interval, one log per n updates
                                 (default: 10) """)
@@ -100,7 +104,7 @@ def get_args():
     parser.add_argument('--randomize_env_every', type=int, default=0,
                         help="randomize scene in a thread every k episodes")
 
-    ## Global Policy RL PPO Hyperparameters
+    # Global Policy RL PPO Hyperparameters
     parser.add_argument('--global_lr', type=float, default=2.5e-5, #2.5e-5
                         help='global learning rate (default: 2.5e-5)')
     parser.add_argument('--global_hidden_size', type=int, default=256,
